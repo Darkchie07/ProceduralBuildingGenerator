@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -5,48 +6,31 @@ using UnityEngine;
 
 public class Generator : MonoBehaviour
 {
-    public enum ObjectProcedural
-    {
-        Cube,
-        Pyramid
-    }
-
-    [Header("Choose the object")] 
-    public ObjectProcedural _object;
-    
-    [Header("Set the size")]
+    /*[Header("Set the size")]
     public float length;
     public float width;
     public float height;
+    public int jumlahLantai;*/
     private Mesh mesh;
-    void Start()
+
+    public void CreateCube(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        if (_object == ObjectProcedural.Cube)
-        {
-            CreateCube(length,width,height);
-        }else if (_object == ObjectProcedural.Pyramid)
-        {
-            CreatePyramid(length, width, height);
-        }
         
         MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
         meshCollider.sharedMesh = mesh;
-    }
-
-    public void CreateCube(float _lenght, float _width, float _height )
-    {
+        
         float tempLenght = _lenght / 2;
         float tempWidth = _width / 2;
         // Define the vertices of the cube
         Vector3[] vertices = new Vector3[]
         {
             // Front face
-            new Vector3(-(tempLenght), 0, -(tempWidth)),
-            new Vector3(-(tempLenght), 0, tempWidth),
-            new Vector3(tempLenght, 0, tempWidth),
-            new Vector3(tempLenght, 0, -(tempWidth)),
+            new Vector3(-(tempLenght), _dasar, -(tempWidth)),
+            new Vector3(-(tempLenght), _dasar, tempWidth),
+            new Vector3(tempLenght, _dasar, tempWidth),
+            new Vector3(tempLenght, _dasar, -(tempWidth)),
 
             // Back face
             new Vector3(-(tempLenght), _height, -(tempWidth)),
@@ -100,8 +84,14 @@ public class Generator : MonoBehaviour
         mesh.RecalculateNormals();
     }
     
-    public void CreatePyramid(float _lenght, float _width, float _height )
+    public void CreatePyramid(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
     {
+        mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
+        
+        MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
+        meshCollider.sharedMesh = mesh;
+
         float tempLenght = _lenght / 2;
         float tempWidth = _width / 2;
 
@@ -111,10 +101,10 @@ public class Generator : MonoBehaviour
         Vector3[] vertices = new Vector3[]
         {
             // Front face
-            new Vector3(-(tempLenght), 0, -(tempWidth)),
-            new Vector3(-(tempLenght), 0, tempWidth),
-            new Vector3(tempLenght, 0, tempWidth),
-            new Vector3(tempLenght, 0, -(tempWidth)),
+            new Vector3(-(tempLenght), _dasar, -(tempWidth)),
+            new Vector3(-(tempLenght), _dasar, tempWidth),
+            new Vector3(tempLenght, _dasar, tempWidth),
+            new Vector3(tempLenght, _dasar, -(tempWidth)),
 
             // Back face
             new Vector3(centerX, _height, centerZ),
