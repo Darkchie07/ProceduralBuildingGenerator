@@ -12,10 +12,17 @@ public class Generator : MonoBehaviour
     public float height;
     public int jumlahLantai;*/
     private Mesh mesh;
+    
+    public int numSegments = 32;
+    public int numRings = 16;
+    public float radius = 1f;
+    
+    public Transform[] controlPoints;  // Define your control points in the Inspector.
+    public int resolution = 10; 
 
     private void Start()
     {
-        CreateRCBuilding();
+        Generate3DObject();
     }
 
     public void CreateCube(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
@@ -398,5 +405,118 @@ public class Generator : MonoBehaviour
         // Optionally, calculate normals
         mesh.RecalculateNormals();
         meshCollider.sharedMesh = mesh;
+    }
+
+    public void CreateBall()
+    {
+        Mesh mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
+        MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
+
+        Vector3[] vertices = new Vector3[(numSegments + 1) * (numRings + 1)];
+        Vector2[] uv = new Vector2[vertices.Length];
+        Vector3[] normals = new Vector3[vertices.Length];
+
+        int[] triangles = new int[numSegments * numRings * 6];
+
+        float phiStep = Mathf.PI * 2.0f / numSegments;
+        float thetaStep = Mathf.PI / numRings;
+
+        for (int ring = 0; ring <= numRings; ring++)
+        {
+            for (int segment = 0; segment <= numSegments; segment++)
+            {
+                float phi = segment * phiStep;
+                float theta = ring * thetaStep;
+
+                int index = segment + ring * (numSegments + 1);
+
+                float x = radius * Mathf.Sin(theta) * Mathf.Cos(phi);
+                float y = radius * Mathf.Cos(theta);
+                float z = radius * Mathf.Sin(theta) * Mathf.Sin(phi);
+
+                vertices[index] = new Vector3(x, y, z);
+                uv[index] = new Vector2((float)segment / numSegments, (float)ring / numRings);
+                normals[index] = new Vector3(x, y, z).normalized;
+            }
+        }
+
+        int numTriangles = 0;
+        for (int ring = 0; ring < numRings; ring++)
+        {
+            for (int segment = 0; segment < numSegments; segment++)
+            {
+                int current = segment + ring * (numSegments + 1);
+                int next = current + numSegments + 1;
+
+                triangles[numTriangles++] = current;
+                triangles[numTriangles++] = next;
+                triangles[numTriangles++] = current + 1;
+
+                triangles[numTriangles++] = next;
+                triangles[numTriangles++] = next + 1;
+                triangles[numTriangles++] = current + 1;
+            }
+        }
+
+        mesh.vertices = vertices;
+        mesh.uv = uv;
+        mesh.normals = normals;
+        mesh.triangles = triangles;
+        meshCollider.sharedMesh = mesh;
+    }
+    
+    void Generate3DObject()
+    {
+        Mesh mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
+
+        Vector3[] vertices = new Vector3[resolution + 1];
+        Vector2[] uv = new Vector2[resolution + 1];
+
+        for (int i = 0; i <= resolution; i++)
+        {
+            float t = i / (float)resolution;
+            Vector3 vertex = CalculateBezierPoint(t);
+
+            vertices[i] = vertex;
+            uv[i] = new Vector2(t, 0); // Adjust UV coordinates as needed.
+        }
+
+        int[] triangles = new int[resolution * 6];
+
+        for (int i = 0, ti = 0; i < resolution; i++, ti += 6)
+        {
+            triangles[ti] = i;
+            triangles[ti + 1] = i + resolution + 1;
+            triangles[ti + 2] = i + 1;
+
+            triangles[ti + 3] = i + 1;
+            triangles[ti + 4] = i + resolution + 1;
+            triangles[ti + 5] = i + resolution + 2;
+        }
+
+        mesh.vertices = vertices;
+        mesh.uv = uv;
+        mesh.triangles = triangles;
+
+        // Recalculate normals for the mesh to ensure correct shading
+        mesh.RecalculateNormals();
+    }
+
+    Vector3 CalculateBezierPoint(float t)
+    {
+        float u = 1 - t;
+        float tt = t * t;
+        float uu = u * u;
+        float uuu = uu * u;
+        float ttt = tt * t;
+
+        Vector3 p = uuu * controlPoints[0].position +
+                    3 * uu * t * controlPoints[1].position +
+                    3 * u * tt * controlPoints[2].position +
+                    ttt * controlPoints[3].position;
+
+        return p;
     }
 }
