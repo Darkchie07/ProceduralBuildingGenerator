@@ -17,12 +17,16 @@ public class Generator : MonoBehaviour
     public int numRings = 16;
     public float radius = 1f;
     
+    public float height = 2.0f;
+    public int segments = 32;
+    public int heightSegments = 1; 
+    
     public Transform[] controlPoints;  // Define your control points in the Inspector.
     public int resolution = 10; 
 
     private void Start()
-    {
-        Generate3DObject();
+    { 
+        GenerateCylinder();
     }
 
     public void CreateCube(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
@@ -466,57 +470,63 @@ public class Generator : MonoBehaviour
         meshCollider.sharedMesh = mesh;
     }
     
-    void Generate3DObject()
+    void GenerateCylinder()
     {
         Mesh mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
 
-        Vector3[] vertices = new Vector3[resolution + 1];
-        Vector2[] uv = new Vector2[resolution + 1];
+        int numVertices = (segments + 1) * (heightSegments + 1);
+        Vector3[] vertices = new Vector3[numVertices];
+        Vector3[] normals = new Vector3[numVertices];
+        Vector2[] uv = new Vector2[numVertices];
 
-        for (int i = 0; i <= resolution; i++)
+        int[] triangles = new int[segments * heightSegments * 6];
+
+        float segmentStep = 2 * Mathf.PI / segments;
+        float heightStep = height / heightSegments;
+        int vertexIndex = 0;
+        int triangleIndex = 0;
+
+        for (int i = 0; i <= heightSegments; i++)
         {
-            float t = i / (float)resolution;
-            Vector3 vertex = CalculateBezierPoint(t);
+            float y = i * heightStep - height / 2.0f;
+            for (int j = 0; j <= segments; j++)
+            {
+                float angle = j * segmentStep;
+                float x = Mathf.Cos(angle) * radius;
+                float z = Mathf.Sin(angle) * radius;
 
-            vertices[i] = vertex;
-            uv[i] = new Vector2(t, 0); // Adjust UV coordinates as needed.
-        }
+                Vector3 vertex = new Vector3(x, y, z);
+                vertices[vertexIndex] = vertex;
 
-        int[] triangles = new int[resolution * 6];
+                // Calculate normals and UVs
+                normals[vertexIndex] = new Vector3(x, 0, z).normalized;
+                uv[vertexIndex] = new Vector2((float)j / segments, (float)i / heightSegments);
 
-        for (int i = 0, ti = 0; i < resolution; i++, ti += 6)
-        {
-            triangles[ti] = i;
-            triangles[ti + 1] = i + resolution + 1;
-            triangles[ti + 2] = i + 1;
+                // Create triangles
+                if (i < heightSegments && j < segments)
+                {
+                    int currentRow = i * (segments + 1);
+                    int nextRow = (i + 1) * (segments + 1);
 
-            triangles[ti + 3] = i + 1;
-            triangles[ti + 4] = i + resolution + 1;
-            triangles[ti + 5] = i + resolution + 2;
+                    triangles[triangleIndex] = currentRow + j;
+                    triangles[triangleIndex + 1] = nextRow + j;
+                    triangles[triangleIndex + 2] = currentRow + j + 1;
+
+                    triangles[triangleIndex + 3] = nextRow + j;
+                    triangles[triangleIndex + 4] = nextRow + j + 1;
+                    triangles[triangleIndex + 5] = currentRow + j + 1;
+
+                    triangleIndex += 6;
+                }
+
+                vertexIndex++;
+            }
         }
 
         mesh.vertices = vertices;
+        mesh.normals = normals;
         mesh.uv = uv;
         mesh.triangles = triangles;
-
-        // Recalculate normals for the mesh to ensure correct shading
-        mesh.RecalculateNormals();
-    }
-
-    Vector3 CalculateBezierPoint(float t)
-    {
-        float u = 1 - t;
-        float tt = t * t;
-        float uu = u * u;
-        float uuu = uu * u;
-        float ttt = tt * t;
-
-        Vector3 p = uuu * controlPoints[0].position +
-                    3 * uu * t * controlPoints[1].position +
-                    3 * u * tt * controlPoints[2].position +
-                    ttt * controlPoints[3].position;
-
-        return p;
     }
 }
