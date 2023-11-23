@@ -7,7 +7,7 @@ public class LSystem : MonoBehaviour
     public int iterations;
     public float length = 1.0f;
 
-    private string axiom = "FT";
+    private string axiom = "FTFT";
     private string currentString = "";
     private string nextString = "";
     private Vector3 currentPosition;
@@ -44,6 +44,11 @@ public class LSystem : MonoBehaviour
         }
     }
     
+    void UpdatePosition(float offsetX, float offsetY, float offsetZ)
+    {
+        currentPosition += transform.rotation * new Vector3(offsetX, offsetY, offsetZ);
+    }
+    
     void CreateCubeMesh(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
     {
         // Create a new cube GameObject
@@ -61,20 +66,21 @@ public class LSystem : MonoBehaviour
 
         float tempLenght = _lenght / 2;
         float tempWidth = _width / 2;
+        
         // Define the vertices of the cube
         Vector3[] cubeVertices = new Vector3[]
         {
             // Front face
-            new Vector3(-(tempLenght), _dasar, -(tempWidth)),
-            new Vector3(-(tempLenght), _dasar, tempWidth),
-            new Vector3(tempLenght, _dasar, tempWidth),
-            new Vector3(tempLenght, _dasar, -(tempWidth)),
+            new Vector3(-(tempLenght), _dasar, -(tempWidth)) + currentPosition,
+            new Vector3(-(tempLenght), _dasar, tempWidth) + currentPosition,
+            new Vector3(tempLenght, _dasar, tempWidth) + currentPosition,
+            new Vector3(tempLenght, _dasar, -(tempWidth)) + currentPosition,
 
             // Back face
-            new Vector3(-(tempLenght), _height, -(tempWidth)),
-            new Vector3(-(tempLenght), _height, tempWidth),
-            new Vector3(tempLenght, _height, tempWidth),
-            new Vector3(tempLenght, _height, -(tempWidth)),
+            new Vector3(-(tempLenght), _height, -(tempWidth)) + currentPosition,
+            new Vector3(-(tempLenght), _height, tempWidth) + currentPosition,
+            new Vector3(tempLenght, _height, tempWidth) + currentPosition,
+            new Vector3(tempLenght, _height, -(tempWidth)) + currentPosition,
         };
 
         // Define triangles for the cube
@@ -105,8 +111,8 @@ public class LSystem : MonoBehaviour
             3, 6, 2,
         };
 
-        currentPosition += rotation * new Vector3(length, 0, 0);
-
+        UpdatePosition(_lenght, 0, 0);
+        
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
@@ -127,7 +133,6 @@ public class LSystem : MonoBehaviour
         meshFilter.mesh = mesh;
         meshRenderer.material = colorMaterial;
 
-        Vector3 currentPosition = transform.position;
         Quaternion rotation = transform.rotation;
 
         float tempLenght = _length / 2;
@@ -136,16 +141,17 @@ public class LSystem : MonoBehaviour
         float centerX = tempLenght + (-tempLenght);
         float centerZ = tempWidth + (-tempWidth);
         // Define the vertices of the cube
+        
         Vector3[] pyramidVertices = new Vector3[]
         {
             // Front face
-            new Vector3(-(tempLenght), _dasar, -(tempWidth)),
-            new Vector3(-(tempLenght), _dasar, tempWidth),
-            new Vector3(tempLenght, _dasar, tempWidth),
-            new Vector3(tempLenght, _dasar, -(tempWidth)),
+            new Vector3(-(tempLenght), _dasar, -(tempWidth)) + currentPosition,
+            new Vector3(-(tempLenght), _dasar, tempWidth) + currentPosition,
+            new Vector3(tempLenght, _dasar, tempWidth) + currentPosition,
+            new Vector3(tempLenght, _dasar, -(tempWidth)) + currentPosition,
 
             // Back face
-            new Vector3(centerX, _height, centerZ),
+            new Vector3(centerX, _height, centerZ) + currentPosition,
         };
 
         // Define the triangles to form the cube's faces
@@ -167,8 +173,8 @@ public class LSystem : MonoBehaviour
             // Right face
             3, 0, 4,
         };
-
-        currentPosition += rotation * new Vector3(length + _length, 0, 0);
+        
+        UpdatePosition(_length, 0, 0);
 
         mesh.vertices = pyramidVertices;
         mesh.triangles = pyramidTriangles;
@@ -178,108 +184,89 @@ public class LSystem : MonoBehaviour
 
     public void CreateUBuilding(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
     {
+        // Create a new pyramid GameObject
+        GameObject pyramid = new GameObject("UBuilding");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = pyramid.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = pyramid.AddComponent<MeshRenderer>();
+        
         Mesh mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
-        mesh.Clear();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
 
-        Vector3[] vertices = new Vector3[currentString.Length * 20]; // Allocate enough space for vertices
-        int[] triangles = new int[currentString.Length * 84]; // Allocate enough space for triangles
-        Vector3 currentPosition = transform.position;
         Quaternion rotation = transform.rotation;
-        int vertexIndex = 0;
-        int triangleIndex = 0;
-
-        Debug.Log("Cube");
-        for (int i = 0; i < currentString.Length; i++)
+        
+        // Define the vertices of the cube
+        Vector3[] uVertices = new Vector3[]
         {
-            char currentChar = currentString[i];
+            new Vector3(2, 0, 2), //0 
+            new Vector3(1, 0, 2), //1 
+            new Vector3(1, 0, 0), //2 
+            new Vector3(-1, 0, 0), //3 
+            new Vector3(-1, 0, 2), //4 
+            new Vector3(-2, 0, 2), //5
+            new Vector3(-2, 0, -2), //6
+            new Vector3(2, 0, -2), //7 
+            new Vector3(1, 0, -2), //8
+            new Vector3(-1, 0, -2), //9
+        
+            new Vector3(2, 2, 2), //10
+            new Vector3(1, 2, 2), //11 
+            new Vector3(1, 2, 0), //12 
+            new Vector3(-1, 2, 0), //13
+            new Vector3(-1, 2, 2), //14
+            new Vector3(-2, 2, 2), //15 
+            new Vector3(-2, 2, -2), //16
+            new Vector3(2, 2, -2), //17
+            new Vector3(1, 2, -2), //18
+            new Vector3(-1, 2, -2), //19
+        };
 
-            if (currentChar == 'F')
-            {
-                // Define the vertices of the cube
-                Vector3[] uVertices = new Vector3[]
-            {
-                new Vector3(2, 0, 2), //0 
-                new Vector3(1, 0, 2), //1 
-                new Vector3(1, 0, 0), //2 
-                new Vector3(-1, 0, 0), //3 
-                new Vector3(-1, 0, 2), //4 
-                new Vector3(-2, 0, 2), //5
-                new Vector3(-2, 0, -2), //6
-                new Vector3(2, 0, -2), //7 
-                new Vector3(1, 0, -2), //8
-                new Vector3(-1, 0, -2), //9
-            
-                new Vector3(2, 2, 2), //10
-                new Vector3(1, 2, 2), //11 
-                new Vector3(1, 2, 0), //12 
-                new Vector3(-1, 2, 0), //13
-                new Vector3(-1, 2, 2), //14
-                new Vector3(-2, 2, 2), //15 
-                new Vector3(-2, 2, -2), //16
-                new Vector3(2, 2, -2), //17
-                new Vector3(1, 2, -2), //18
-                new Vector3(-1, 2, -2), //19
-            };
+        // Define the triangles to form the cube's faces
+        int[] uTriangles = new int[]
+        {
+        0, 1, 8,
+        0, 8, 7,
+        4, 5, 6,
+        4, 6, 9,
+        2, 3, 9,
+        2, 9, 8,
 
-                for (int j = 0; j < uVertices.Length; j++)
-                {
-                    vertices[vertexIndex] = currentPosition + rotation * uVertices[j];
-                    vertexIndex++;
-                }
+        10, 18, 11,
+        10, 17, 18,
+        14, 16, 15,
+        14, 19, 16,
+        12, 19, 13,
+        12, 18, 19,
 
-                // Define the triangles to form the cube's faces
-                int[] uTriangles = new int[]
-                {
-                0, 1, 8,
-                0, 8, 7,
-                4, 5, 6,
-                4, 6, 9,
-                2, 3, 9,
-                2, 9, 8,
+        0, 11, 1,
+        0, 10, 11,
 
-                10, 18, 11,
-                10, 17, 18,
-                14, 16, 15,
-                14, 19, 16,
-                12, 19, 13,
-                12, 18, 19,
+        1, 12, 2,
+        1, 11, 12,
 
-                0, 11, 1,
-                0, 10, 11,
+        3, 14, 4,
+        3, 13, 14,
 
-                1, 12, 2,
-                1, 11, 12,
+        2, 13, 3,
+        2, 12, 13,
 
-                3, 14, 4,
-                3, 13, 14,
+        4, 15, 5,
+        4, 14, 15,
 
-                2, 13, 3,
-                2, 12, 13,
+        0, 7, 17,
+        0, 17, 10,
 
-                4, 15, 5,
-                4, 14, 15,
+        5, 16, 6,
+        5, 15, 16,
 
-                0, 7, 17,
-                0, 17, 10,
+        6, 17, 7,
+        6, 16, 17,
+        };
 
-                5, 16, 6,
-                5, 15, 16,
-
-                6, 17, 7,
-                6, 16, 17,
-                };
-
-                for (int j = 0; j < uTriangles.Length; j++)
-                {
-                    triangles[triangleIndex] = vertexIndex - uVertices.Length + uTriangles[j];
-                    triangleIndex++;
-                }
-            }
-        }
-
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
+        mesh.vertices = uVertices;
+        mesh.triangles = uTriangles;
         mesh.RecalculateNormals();
     }
 
