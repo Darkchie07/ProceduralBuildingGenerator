@@ -7,7 +7,7 @@ public class LSystem : MonoBehaviour
     public int iterations;
     public float length = 1.0f;
 
-    private string axiom = "FTFT";
+    public string axiom = "FTFTUF";
     private string currentString = "";
     private string nextString = "";
     private Vector3 currentPosition;
@@ -16,6 +16,7 @@ public class LSystem : MonoBehaviour
 
     void Start()
     {
+        currentPosition = Vector3.zero;
         GenerateLSystem();
     }
 
@@ -34,22 +35,27 @@ public class LSystem : MonoBehaviour
                 Debug.Log(currentChar == 'F');
                 if (currentChar == 'F')
                 {
-                    CreateCubeMesh(1, 1, 1);
+                    CreateCubeMesh(2, 1, 1);
                 }
-                else
+                else if (currentChar == 'T')
                 {
-                    CreatePyramid(1, 1, 1);
+                    CreatePyramid(3, 2, 1);
+                }
+                else if (currentChar == 'U')
+                {
+                    CreateUBuilding(3, 3, 1, 1, 1, 0);
                 }
             }
         }
     }
     
-    void UpdatePosition(float offsetX, float offsetY, float offsetZ)
+    void UpdatePosition(Vector3 lastPos)
     {
-        currentPosition += transform.rotation * new Vector3(offsetX, offsetY, offsetZ);
+        Quaternion rotation = transform.rotation;
+        currentPosition += rotation * lastPos;
     }
     
-    void CreateCubeMesh(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
+    void CreateCubeMesh(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
     {
         // Create a new cube GameObject
         GameObject cube = new GameObject("Cube");
@@ -64,14 +70,14 @@ public class LSystem : MonoBehaviour
 
         Quaternion rotation = transform.rotation;
 
-        float tempLenght = _lenght / 2;
+        float tempLenght = _length / 2;
         float tempWidth = _width / 2;
-        
+
         // Define the vertices of the cube
         Vector3[] cubeVertices = new Vector3[]
         {
             // Front face
-            new Vector3(-(tempLenght), _dasar, -(tempWidth)) + currentPosition,
+            new Vector3(-tempLenght, _dasar, -tempWidth) + currentPosition,
             new Vector3(-(tempLenght), _dasar, tempWidth) + currentPosition,
             new Vector3(tempLenght, _dasar, tempWidth) + currentPosition,
             new Vector3(tempLenght, _dasar, -(tempWidth)) + currentPosition,
@@ -111,8 +117,10 @@ public class LSystem : MonoBehaviour
             3, 6, 2,
         };
 
-        UpdatePosition(_lenght, 0, 0);
+        Vector3 lastPos = new Vector3(tempLenght, _dasar, tempWidth) + currentPosition;
         
+        UpdatePosition(lastPos);
+
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
@@ -140,7 +148,11 @@ public class LSystem : MonoBehaviour
 
         float centerX = tempLenght + (-tempLenght);
         float centerZ = tempWidth + (-tempWidth);
-        // Define the vertices of the cube
+
+        if (_length % 2 != 0)
+        {
+            currentPosition -= new Vector3(0.5f, 0, 0);
+        }
         
         Vector3[] pyramidVertices = new Vector3[]
         {
@@ -153,6 +165,8 @@ public class LSystem : MonoBehaviour
             // Back face
             new Vector3(centerX, _height, centerZ) + currentPosition,
         };
+        
+        Debug.Log(pyramidVertices[0]);
 
         // Define the triangles to form the cube's faces
         int[] pyramidTriangles = new int[]
@@ -174,7 +188,9 @@ public class LSystem : MonoBehaviour
             3, 0, 4,
         };
         
-        UpdatePosition(_length, 0, 0);
+        Vector3 lastPos = new Vector3(tempLenght, _dasar, tempWidth) + currentPosition;
+        
+        UpdatePosition(lastPos);
 
         mesh.vertices = pyramidVertices;
         mesh.triangles = pyramidTriangles;
@@ -182,7 +198,7 @@ public class LSystem : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
-    public void CreateUBuilding(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
+    public void CreateUBuilding(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
         // Create a new pyramid GameObject
         GameObject pyramid = new GameObject("UBuilding");
@@ -200,27 +216,29 @@ public class LSystem : MonoBehaviour
         // Define the vertices of the cube
         Vector3[] uVertices = new Vector3[]
         {
-            new Vector3(2, 0, 2), //0 
-            new Vector3(1, 0, 2), //1 
-            new Vector3(1, 0, 0), //2 
-            new Vector3(-1, 0, 0), //3 
-            new Vector3(-1, 0, 2), //4 
-            new Vector3(-2, 0, 2), //5
-            new Vector3(-2, 0, -2), //6
-            new Vector3(2, 0, -2), //7 
-            new Vector3(1, 0, -2), //8
-            new Vector3(-1, 0, -2), //9
-        
-            new Vector3(2, 2, 2), //10
-            new Vector3(1, 2, 2), //11 
-            new Vector3(1, 2, 0), //12 
-            new Vector3(-1, 2, 0), //13
-            new Vector3(-1, 2, 2), //14
-            new Vector3(-2, 2, 2), //15 
-            new Vector3(-2, 2, -2), //16
-            new Vector3(2, 2, -2), //17
-            new Vector3(1, 2, -2), //18
-            new Vector3(-1, 2, -2), //19
+            // Bottom U-shaped base
+            new Vector3(_width / 2, _dasar, _length / 2) + currentPosition,          // 0
+            new Vector3(_innerWidth / 2, _dasar, _length / 2) + currentPosition,     // 1
+            new Vector3(_innerWidth / 2, _dasar, _innerLength / 2) + currentPosition,// 2
+            new Vector3(-_innerWidth / 2, _dasar, _innerLength / 2) + currentPosition,// 3
+            new Vector3(-_innerWidth / 2, _dasar, _length / 2) + currentPosition,    // 4
+            new Vector3(-_width / 2, _dasar, _length / 2) + currentPosition,          // 5
+            new Vector3(-_width / 2, _dasar, -_length / 2) + currentPosition,         // 6
+            new Vector3(_width / 2, _dasar, -_length / 2) + currentPosition,          // 7
+            new Vector3(_innerWidth / 2, _dasar, -_innerLength / 2) + currentPosition,// 8
+            new Vector3(-_innerWidth / 2, _dasar, -_innerLength / 2) + currentPosition,// 9
+
+            // Top building-like structure
+            new Vector3(_width / 2, _height, _length / 2) + currentPosition,          // 10
+            new Vector3(_innerWidth / 2, _height, _length / 2) + currentPosition,     // 11
+            new Vector3(_innerWidth / 2, _height, _innerLength / 2) + currentPosition,// 12
+            new Vector3(-_innerWidth / 2, _height, _innerLength / 2) + currentPosition,// 13
+            new Vector3(-_innerWidth / 2, _height, _length / 2) + currentPosition,    // 14
+            new Vector3(-_width / 2, _height, _length / 2) + currentPosition,          // 15
+            new Vector3(-_width / 2, _height, -_length / 2) + currentPosition,         // 16
+            new Vector3(_width / 2, _height, -_length / 2) + currentPosition,          // 17
+            new Vector3(_innerWidth / 2, _height, -_innerLength / 2) + currentPosition,// 18
+            new Vector3(-_innerWidth / 2, _height, -_innerLength / 2) + currentPosition,// 19
         };
 
         // Define the triangles to form the cube's faces

@@ -1447,6 +1447,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   iterations: 1
   length: 1
+  axiom: FT
   colorMaterial: {fileID: 2100000, guid: 30ec90287deacee44818d47cad882ea8, type: 2}
 --- !u!1 &1903337158
 GameObject:
