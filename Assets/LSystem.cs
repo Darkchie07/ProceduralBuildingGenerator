@@ -322,15 +322,13 @@ public class LSystem : MonoBehaviour
             new Vector3(currentPosition.x + _innerLength, _dasar, _width), //3 -
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + (_width - _innerWidth)), //6 
 
-            new Vector3(currentPosition.x, _height, currentPosition.z), //7
-            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //8
-            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //9 -
-            new Vector3(currentPosition.x + _innerLength, _height, _width), //10 -
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //11 
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //12
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + (_width - _innerWidth)), //13
+            new Vector3(currentPosition.x, _height, currentPosition.z), //6
+            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //7
+            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //8 -
+            new Vector3(currentPosition.x + _innerLength, _height, _width), //9 -
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //10 
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //11
         };
 
         // Define the triangles to form the cube's faces
@@ -353,28 +351,28 @@ public class LSystem : MonoBehaviour
             4, 0 ,5,
             4, 2, 0,
             
-            8, 9, 7,
-            10, 11 , 9,
-            11, 12, 7,
-            11, 7, 9,
+            7, 8, 6,
+            9, 10 , 8,
+            10, 11, 6,
+            10, 6, 8,
 
-            0, 1, 8,
-            0, 8, 7,
+            0, 1, 7,
+            0, 7, 6,
 
-            1, 2, 9,
-            1, 9, 8,
+            1, 2, 8,
+            1, 8, 7,
 
-            2, 3, 9,
-            3, 10, 9,
+            2, 3, 8,
+            3, 9, 8,
 
-            3, 4, 10,
+            3, 4, 9,
+            10, 9, 4,
+
+            4, 5, 11,
             11, 10, 4,
 
-            4, 5, 12,
-            12, 11, 4,
-
-            0, 7, 5,
-            7, 12, 5,
+            6, 5, 0,
+            6, 11, 5,
         };
 
         UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
@@ -600,7 +598,7 @@ public class LSystem : MonoBehaviour
     
     public void LRoof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
-        GameObject LBuilding = new GameObject("LBuilding");
+        GameObject LBuilding = new GameObject("LRoof");
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = LBuilding.AddComponent<MeshFilter>();
@@ -620,15 +618,13 @@ public class LSystem : MonoBehaviour
             new Vector3(currentPosition.x + _innerLength, _dasar, _width), //3 -
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + (_width - _innerWidth)), //6 
 
-            new Vector3(currentPosition.x, _height, currentPosition.z), //7
-            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //8
-            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //9 -
-            new Vector3(currentPosition.x + _innerLength, _height, _width), //10 -
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //11 
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //12
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + (_width - _innerWidth)), //13
+            new Vector3(currentPosition.x, _height, currentPosition.z), //6
+            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //7
+            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //8 -
+            new Vector3(currentPosition.x + _innerLength, _height, _width), //9 -
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //10 
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //11
         };
 
         // Define the triangles to form the cube's faces
@@ -639,28 +635,28 @@ public class LSystem : MonoBehaviour
             4, 0 ,5,
             4, 2, 0,
             
-            8, 9, 7,
-            10, 11 , 9,
-            11, 12, 7,
-            11, 7, 9,
+            7, 8, 6,
+            9, 10 , 8,
+            10, 11, 6,
+            10, 6, 8,
 
-            0, 1, 8,
-            0, 8, 7,
+            0, 1, 7,
+            0, 7, 6,
 
-            1, 2, 9,
-            1, 9, 8,
+            1, 2, 8,
+            1, 8, 7,
 
-            2, 3, 9,
-            3, 10, 9,
+            2, 3, 8,
+            3, 9, 8,
 
-            3, 4, 10,
+            3, 4, 9,
+            10, 9, 4,
+
+            4, 5, 11,
             11, 10, 4,
 
-            4, 5, 12,
-            12, 11, 4,
-
-            0, 7, 5,
-            7, 12, 5,
+            6, 5, 0,
+            6, 11, 5,
         };
 
         UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
