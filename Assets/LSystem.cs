@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEditor;
 using UnityEngine;
 
 public class LSystem : MonoBehaviour
@@ -11,6 +13,8 @@ public class LSystem : MonoBehaviour
     private string currentString = "";
     private string nextString = "";
     private Vector3 currentPosition;
+
+    public GameObject prefabs;
 
     public Material colorMaterial;
 
@@ -35,7 +39,7 @@ public class LSystem : MonoBehaviour
                 Debug.Log(currentChar == 'F');
                 if (currentChar == 'F')
                 {
-                    CreateCubeMesh(2, 1, 1);
+                    CreateCubeMesh(3, 1, 1);
                 }
                 else if (currentChar == 'T')
                 {
@@ -44,14 +48,28 @@ public class LSystem : MonoBehaviour
                 else if (currentChar == 'U')
                 {
                     CreateUBuilding(3, 3, 1, 1, 1, 0);
+                }else if (currentChar == 'L')
+                {
+                    CreateLBuilding(3, 3, 1, 1, 1, 0);
+                }else if (currentChar == 'R')
+                {
+                    CreateRCBuilding(3, 3, 1, 1, 1, 0);
+                }
+                else if (currentChar == 'A')
+                {
+                    Uroof2(3, 3, 1, 1, 1, 0);
                 }
             }
         }
+        // string prefabPath = "Assets/Prefabs/" + gameObject.name + ".prefab";
+        // PrefabUtility.SaveAsPrefabAsset(gameObject, prefabPath);
+        // Debug.Log("Prefab saved at: " + prefabPath);
     }
     
     void UpdatePosition(Vector3 lastPos)
     {
         Quaternion rotation = transform.rotation;
+        Debug.Log(currentPosition);
         currentPosition += rotation * lastPos;
     }
     
@@ -70,23 +88,21 @@ public class LSystem : MonoBehaviour
 
         Quaternion rotation = transform.rotation;
 
-        float tempLenght = _length / 2;
-        float tempWidth = _width / 2;
-
+        float tempLenght = currentPosition.x + _length;  
         // Define the vertices of the cube
         Vector3[] cubeVertices = new Vector3[]
         {
             // Front face
-            new Vector3(-tempLenght, _dasar, -tempWidth) + currentPosition,
-            new Vector3(-(tempLenght), _dasar, tempWidth) + currentPosition,
-            new Vector3(tempLenght, _dasar, tempWidth) + currentPosition,
-            new Vector3(tempLenght, _dasar, -(tempWidth)) + currentPosition,
+            new Vector3(currentPosition.x, _dasar, currentPosition.z),
+            new Vector3(currentPosition.x, _dasar, _width),
+            new Vector3(tempLenght, _dasar, _width),
+            new Vector3(tempLenght, _dasar, currentPosition.z),
 
             // Back face
-            new Vector3(-(tempLenght), _height, -(tempWidth)) + currentPosition,
-            new Vector3(-(tempLenght), _height, tempWidth) + currentPosition,
-            new Vector3(tempLenght, _height, tempWidth) + currentPosition,
-            new Vector3(tempLenght, _height, -(tempWidth)) + currentPosition,
+            new Vector3(currentPosition.x, _height, currentPosition.z),
+            new Vector3(currentPosition.x, _height, _width),
+            new Vector3(tempLenght, _height, _width),
+            new Vector3(tempLenght, _height, currentPosition.z),
         };
 
         // Define triangles for the cube
@@ -117,13 +133,14 @@ public class LSystem : MonoBehaviour
             3, 6, 2,
         };
 
-        Vector3 lastPos = new Vector3(tempLenght, _dasar, tempWidth) + currentPosition;
-        
-        UpdatePosition(lastPos);
+        Debug.Log(tempLenght);
+        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
 
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
+
+        Instantiate(prefabs, cube.transform);
 
         Debug.Log("Cube");
     }
@@ -143,30 +160,24 @@ public class LSystem : MonoBehaviour
 
         Quaternion rotation = transform.rotation;
 
-        float tempLenght = _length / 2;
+        float tempLenght = currentPosition.x + _length;  
+        float tempLengthX = _length / 2;
         float tempWidth = _width / 2;
 
-        float centerX = tempLenght + (-tempLenght);
-        float centerZ = tempWidth + (-tempWidth);
+        float centerX = tempLengthX + currentPosition.x;
+        float centerZ = tempWidth + currentPosition.z;
 
-        if (_length % 2 != 0)
-        {
-            currentPosition -= new Vector3(0.5f, 0, 0);
-        }
-        
         Vector3[] pyramidVertices = new Vector3[]
         {
             // Front face
-            new Vector3(-(tempLenght), _dasar, -(tempWidth)) + currentPosition,
-            new Vector3(-(tempLenght), _dasar, tempWidth) + currentPosition,
-            new Vector3(tempLenght, _dasar, tempWidth) + currentPosition,
-            new Vector3(tempLenght, _dasar, -(tempWidth)) + currentPosition,
+            new Vector3(currentPosition.x, _dasar, currentPosition.z),
+            new Vector3(currentPosition.x, _dasar, _width),
+            new Vector3(tempLenght, _dasar, _width),
+            new Vector3(tempLenght, _dasar, currentPosition.z),
 
             // Back face
-            new Vector3(centerX, _height, centerZ) + currentPosition,
+            new Vector3(centerX, _height, centerZ),
         };
-        
-        Debug.Log(pyramidVertices[0]);
 
         // Define the triangles to form the cube's faces
         int[] pyramidTriangles = new int[]
@@ -187,10 +198,9 @@ public class LSystem : MonoBehaviour
             // Right face
             3, 0, 4,
         };
-        
-        Vector3 lastPos = new Vector3(tempLenght, _dasar, tempWidth) + currentPosition;
-        
-        UpdatePosition(lastPos);
+
+        Debug.Log(tempLenght);
+        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
 
         mesh.vertices = pyramidVertices;
         mesh.triangles = pyramidTriangles;
@@ -201,44 +211,44 @@ public class LSystem : MonoBehaviour
     public void CreateUBuilding(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
         // Create a new pyramid GameObject
-        GameObject pyramid = new GameObject("UBuilding");
+        GameObject UBuilding = new GameObject("UBuilding");
 
         // Add MeshFilter and MeshRenderer components
-        MeshFilter meshFilter = pyramid.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = pyramid.AddComponent<MeshRenderer>();
+        MeshFilter meshFilter = UBuilding.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = UBuilding.AddComponent<MeshRenderer>();
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
         meshRenderer.material = colorMaterial;
 
         Quaternion rotation = transform.rotation;
-        
+
+        float tempInnerLength = (_length - _innerLength) / 2;
+
         // Define the vertices of the cube
         Vector3[] uVertices = new Vector3[]
         {
-            // Bottom U-shaped base
-            new Vector3(_width / 2, _dasar, _length / 2) + currentPosition,          // 0
-            new Vector3(_innerWidth / 2, _dasar, _length / 2) + currentPosition,     // 1
-            new Vector3(_innerWidth / 2, _dasar, _innerLength / 2) + currentPosition,// 2
-            new Vector3(-_innerWidth / 2, _dasar, _innerLength / 2) + currentPosition,// 3
-            new Vector3(-_innerWidth / 2, _dasar, _length / 2) + currentPosition,    // 4
-            new Vector3(-_width / 2, _dasar, _length / 2) + currentPosition,          // 5
-            new Vector3(-_width / 2, _dasar, -_length / 2) + currentPosition,         // 6
-            new Vector3(_width / 2, _dasar, -_length / 2) + currentPosition,          // 7
-            new Vector3(_innerWidth / 2, _dasar, -_innerLength / 2) + currentPosition,// 8
-            new Vector3(-_innerWidth / 2, _dasar, -_innerLength / 2) + currentPosition,// 9
-
-            // Top building-like structure
-            new Vector3(_width / 2, _height, _length / 2) + currentPosition,          // 10
-            new Vector3(_innerWidth / 2, _height, _length / 2) + currentPosition,     // 11
-            new Vector3(_innerWidth / 2, _height, _innerLength / 2) + currentPosition,// 12
-            new Vector3(-_innerWidth / 2, _height, _innerLength / 2) + currentPosition,// 13
-            new Vector3(-_innerWidth / 2, _height, _length / 2) + currentPosition,    // 14
-            new Vector3(-_width / 2, _height, _length / 2) + currentPosition,          // 15
-            new Vector3(-_width / 2, _height, -_length / 2) + currentPosition,         // 16
-            new Vector3(_width / 2, _height, -_length / 2) + currentPosition,          // 17
-            new Vector3(_innerWidth / 2, _height, -_innerLength / 2) + currentPosition,// 18
-            new Vector3(-_innerWidth / 2, _height, -_innerLength / 2) + currentPosition,// 19
+            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z), //1 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _innerWidth), //2 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _innerWidth), //3 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z), //4 
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //6
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //7 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _width), //8
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _width), //9
+        
+            new Vector3(currentPosition.x, _height, currentPosition.z), //10 
+            new Vector3(currentPosition.x + tempInnerLength, _height, currentPosition.z), //11 
+            new Vector3(currentPosition.x + tempInnerLength, _height, currentPosition.z + _innerWidth), //12 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _height, currentPosition.z + _innerWidth), //13 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _height, currentPosition.z), //14 
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //15
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //16
+            new Vector3(currentPosition.x, _height, currentPosition.z + _width), //17 
+            new Vector3(currentPosition.x + tempInnerLength, _height, currentPosition.z + _width), //18
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _height, currentPosition.z + _width), //19
         };
 
         // Define the triangles to form the cube's faces
@@ -282,190 +292,381 @@ public class LSystem : MonoBehaviour
         6, 17, 7,
         6, 16, 17,
         };
+        
+        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
 
         mesh.vertices = uVertices;
         mesh.triangles = uTriangles;
         mesh.RecalculateNormals();
     }
 
-    public void CreateLBuilding(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
+    public void CreateLBuilding(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
+        GameObject LBuilding = new GameObject("LBuilding");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = LBuilding.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = LBuilding.AddComponent<MeshRenderer>();
+        
         Mesh mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
-        mesh.Clear();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
 
-        Vector3[] vertices = new Vector3[currentString.Length * 14]; // Allocate enough space for vertices
-        int[] triangles = new int[currentString.Length * 60]; // Allocate enough space for triangles
-        Vector3 currentPosition = transform.position;
         Quaternion rotation = transform.rotation;
-        int vertexIndex = 0;
-        int triangleIndex = 0;
-
-        // Define the vertices of the cube
-        for (int i = 0; i < currentString.Length; i++)
+        
+        Vector3[] LVertices = new Vector3[]
         {
-            char currentChar = currentString[i];
+            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //1 
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //2 -
+            new Vector3(currentPosition.x + _innerLength, _dasar, _width), //3 -
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + (_width - _innerWidth)), //6 
 
-            if (currentChar == 'F')
-            {
-                Vector3[] LVertices = new Vector3[]
-                {
-                    new Vector3(-2, 0, 2), //0 
-                    new Vector3(0, 0, 2), //1 
-                    new Vector3(0, 0, 0), //2 -
-                    new Vector3(2, 0, 0), //3 -
-                    new Vector3(2, 0, -2), //4 
-                    new Vector3(-2, 0, -2), //5
-                    new Vector3(-2, 0, 0), //6 
+            new Vector3(currentPosition.x, _height, currentPosition.z), //7
+            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //8
+            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //9 -
+            new Vector3(currentPosition.x + _innerLength, _height, _width), //10 -
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //11 
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //12
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + (_width - _innerWidth)), //13
+        };
 
-                    new Vector3(-2, 2, 2), //7 
-                    new Vector3(0, 2, 2), //8 
-                    new Vector3(0, 2, 0), //9 -
-                    new Vector3(2, 2, 0), //10 -
-                    new Vector3(2, 2, -2), //11 
-                    new Vector3(-2, 2, -2), //12
-                    new Vector3(-2, 2, 0), //13
-                };
-
-                for (int j = 0; j < LVertices.Length; j++)
-                {
-                    vertices[vertexIndex] = currentPosition + rotation * LVertices[j];
-                    vertexIndex++;
-                }
-
-                // Define the triangles to form the cube's faces
-                int[] LTriangles = new int[]
-                {
-                    6, 1, 0,
-                    2, 1, 6,
-
-                    4, 3, 6,
-                    5, 4, 6,
-
-                    8, 13, 7,
-                    8, 9, 13,
-
-                    10, 11, 13,
-                    11, 12, 13,
-
-                    0, 1, 8,
-                    0, 8, 7,
-
-                    1, 2, 9,
-                    1, 9, 8,
-
-                    2, 3, 9,
-                    3, 10, 9,
-
-                    3, 4, 10,
-                    11, 10, 4,
-
-                    4, 5, 12,
-                    12, 11, 4,
-
-                    0, 7, 5,
-                    7, 12, 5,
-                };
-
-                for (int j = 0; j < LTriangles.Length; j++)
-                {
-                    triangles[triangleIndex] = vertexIndex - LVertices.Length + LTriangles[j];
-                    triangleIndex++;
-                }
-
-                currentPosition += rotation * new Vector3(0, 0, length);
-            }
-        }
-
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
-    }
-
-    public void CreateRCBuilding(float _lenght = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
-    {
-        Mesh mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
-        mesh.Clear();
-
-        Vector3[] vertices = new Vector3[currentString.Length * 24]; // Allocate enough space for vertices
-        int[] triangles = new int[currentString.Length * 36]; // Allocate enough space for triangles
-        Vector3 currentPosition = transform.position;
-        Quaternion rotation = transform.rotation;
-        int vertexIndex = 0;
-        int triangleIndex = 0;
-
-        for (int i = 0; i < currentString.Length; i++)
+        // Define the triangles to form the cube's faces
+        int[] LTriangles = new int[]
         {
-            char currentChar = currentString[i];
+            /*6, 1, 0,
+            6, 0, 5,*/
 
-            if (currentChar == 'F')
-            {
-                // Define the vertices of the cube
-                Vector3[] RCVertices = new Vector3[]
-                {
-                    new Vector3(0, 0, 2), //0
-                    new Vector3(2, 0, 2), //1 
-                    new Vector3(2, 0, -2), //2
-                    new Vector3(-2, 0, -2), //3 
-                    new Vector3(-2, 0, 0), //4
-                    new Vector3(0, 0, 0), //5
+            /*4, 3, 6,
+            6, 3, 2,*/
+
+            /*8, 13, 7,
+            13, 12, 7,
+
+            10, 11, 13,
+            13, 9, 10,*/
             
-                    new Vector3(0, 2, 2), //6
-                    new Vector3(2, 2, 2), //7 
-                    new Vector3(2, 2, -2), //8
-                    new Vector3(-2, 2, -2), //9 
-                    new Vector3(-2, 2, 0), //10
-                    new Vector3(0, 2, 0), //11
-                };
+            1, 0, 2,
+            3, 2, 4,
+            4, 0 ,5,
+            4, 2, 0,
+            
+            8, 9, 7,
+            10, 11 , 9,
+            11, 12, 7,
+            11, 7, 9,
 
-                for (int j = 0; j < RCVertices.Length; j++)
-                {
-                    vertices[vertexIndex] = currentPosition + rotation * RCVertices[j];
-                    vertexIndex++;
-                }
+            0, 1, 8,
+            0, 8, 7,
 
-                // Define the triangles to form the cube's faces
-                int[] RCTriangles = new int[]
-                {
-                    0, 4, 5,
-                    1, 3, 2,
-                    0, 5, 1,
-                    5, 4, 3,
+            1, 2, 9,
+            1, 9, 8,
 
-                    6, 11, 10,
-                    7, 8, 9,
-                    6, 7, 11,
-                    11, 9, 10,
+            2, 3, 9,
+            3, 10, 9,
 
-                    0, 10, 4,
-                    0, 6, 10,
+            3, 4, 10,
+            11, 10, 4,
 
-                    0, 1 , 7,
-                    0, 7, 6,
+            4, 5, 12,
+            12, 11, 4,
 
-                    1, 2, 8,
-                    1, 8, 7,
+            0, 7, 5,
+            7, 12, 5,
+        };
 
-                    2, 3, 9,
-                    2, 9, 8,
+        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
 
-                    3, 4, 10,
-                    3, 10, 9,
-                };
-
-                for (int j = 0; j < RCTriangles.Length; j++)
-                {
-                    triangles[triangleIndex] = vertexIndex - RCVertices.Length + RCTriangles[j];
-                    triangleIndex++;
-                }
-
-                currentPosition += rotation * new Vector3(0, 0, length);
-            }
-        }
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
+        mesh.vertices = LVertices;
+        mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
     }
 
+    public void CreateRCBuilding(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    {
+        GameObject RCBuilding = new GameObject("RCBuilding");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = RCBuilding.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = RCBuilding.AddComponent<MeshRenderer>();
+        
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
+
+        Quaternion rotation = transform.rotation;
+        
+        // Define the vertices of the cube
+        Vector3[] RCVertices = new Vector3[]
+        {
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z), //0
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //1 
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //2
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //3 
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + _innerWidth), //5
+    
+            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z), //0
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //1 
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //2
+            new Vector3(currentPosition.x, _height, currentPosition.z + _width), //3 
+            new Vector3(currentPosition.x, _height, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + _innerWidth), //5
+        };
+
+        // Define the triangles to form the cube's faces
+        int[] RCTriangles = new int[]
+        {
+            0, 5, 4,
+            1, 2, 3,
+            5, 0, 1,
+            5, 3, 4,
+            1, 3, 5,
+
+            6, 10, 11,
+            7, 9, 8,
+            7, 6, 11,
+            11, 10, 9,
+            7, 11, 9,
+
+            0, 4, 10,
+            0, 10, 6,
+
+            0, 7 , 1,
+            0, 6, 7,
+
+            1, 8, 2,
+            1, 7, 8,
+
+            2, 9, 3,
+            2, 8, 9,
+
+            3, 10, 4,
+            3, 9, 10,
+        };
+
+        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
+                
+        mesh.vertices = RCVertices;
+        mesh.triangles = RCTriangles;
+        mesh.RecalculateNormals();
+    }
+
+    public void Uroof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    {
+        // Create a new cube GameObject
+        GameObject roof = new GameObject("Roof");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = roof.AddComponent<MeshRenderer>();
+
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
+        
+        Quaternion rotation = transform.rotation;
+
+        float tempInnerLength = (_length - _innerLength) / 2;
+        float tempInnerZ = (_width - _innerWidth) / 2;
+        
+        Vector3[] uRoof1Vertices = new Vector3[]
+        {
+            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z), //1 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _innerWidth), //2 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _innerWidth), //3 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z), //4 
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //6
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //7 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _width), //8
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _width), //9
+            
+            new Vector3(currentPosition.x + (tempInnerLength / 2), _height, currentPosition.z), //10
+            new Vector3(currentPosition.x + (tempInnerLength / 2), _height, currentPosition.z + _innerWidth + tempInnerZ), //11
+            new Vector3((currentPosition.x + _length) - (_innerLength/2), _height, currentPosition.z + _innerWidth + tempInnerZ), //13
+            new Vector3((currentPosition.x + _length) - (_innerLength/2), _height, currentPosition.z), //12
+        };
+        
+        // Define the triangles to form the cube's faces
+        int[] uRoof1Triangles = new int[]
+        {
+            0, 1, 8,
+            0, 8, 7,
+            4, 5, 6,
+            4, 6, 9,
+            2, 3, 9,
+            2, 9, 8,
+
+            0, 10, 1,
+            
+            0, 11, 10,
+            0, 7, 11,
+            
+            1, 10, 11,
+            1, 11, 2,
+            
+            7, 12, 11,
+            7, 6, 12,
+            
+            2, 11, 3,
+            11, 12, 3,
+            
+            4, 3, 12,
+            4, 12, 13,
+            
+            5, 13, 12,
+            5, 12, 6,
+            
+            5, 4, 13,
+        };
+        
+        mesh.vertices = uRoof1Vertices;
+        mesh.triangles = uRoof1Triangles;
+        mesh.RecalculateNormals();
+    }
+    
+    public void Uroof2(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    {
+        // Create a new cube GameObject
+        GameObject roof = new GameObject("Roof");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = roof.AddComponent<MeshRenderer>();
+
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
+        
+        Quaternion rotation = transform.rotation;
+
+        float tempInnerLength = (_length - _innerLength) / 2;
+        float tempInnerZ = (_width - _innerWidth) / 2;
+        
+        Vector3[] uRoof1Vertices = new Vector3[]
+        {
+            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z), //1 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _innerWidth), //2 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _innerWidth), //3 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z), //4 
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //6
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //7 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _width), //8
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _width), //9
+            
+            new Vector3(currentPosition.x + (tempInnerLength / 2), _height, currentPosition.z + _innerWidth + tempInnerZ), //10
+            new Vector3((currentPosition.x + _length) - (_innerLength/2), _height, currentPosition.z + _innerWidth + tempInnerZ), //11
+        };
+        
+        // Define the triangles to form the cube's faces
+        int[] uRoof1Triangles = new int[]
+        {
+            0, 1, 8,
+            0, 8, 7,
+            4, 5, 6,
+            4, 6, 9,
+            2, 3, 9,
+            2, 9, 8,
+
+            0, 10, 1,
+            
+            0, 7, 10,
+            
+            1, 10, 2,
+            
+            2, 10, 11,
+            2, 11, 3,
+            
+            7, 11, 10,
+            7, 6, 11,
+            
+            5, 11, 6,
+            
+            5, 4, 11,
+            
+            4, 3, 11,
+        };
+        
+        mesh.vertices = uRoof1Vertices;
+        mesh.triangles = uRoof1Triangles;
+        mesh.RecalculateNormals();
+    }
+    
+    public void LRoof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    {
+        GameObject LBuilding = new GameObject("LBuilding");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = LBuilding.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = LBuilding.AddComponent<MeshRenderer>();
+        
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
+
+        Quaternion rotation = transform.rotation;
+        
+        Vector3[] LVertices = new Vector3[]
+        {
+            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //1 
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //2 -
+            new Vector3(currentPosition.x + _innerLength, _dasar, _width), //3 -
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + (_width - _innerWidth)), //6 
+
+            new Vector3(currentPosition.x, _height, currentPosition.z), //7
+            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //8
+            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //9 -
+            new Vector3(currentPosition.x + _innerLength, _height, _width), //10 -
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //11 
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //12
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + (_width - _innerWidth)), //13
+        };
+
+        // Define the triangles to form the cube's faces
+        int[] LTriangles = new int[]
+        {
+            1, 0, 2,
+            3, 2, 4,
+            4, 0 ,5,
+            4, 2, 0,
+            
+            8, 9, 7,
+            10, 11 , 9,
+            11, 12, 7,
+            11, 7, 9,
+
+            0, 1, 8,
+            0, 8, 7,
+
+            1, 2, 9,
+            1, 9, 8,
+
+            2, 3, 9,
+            3, 10, 9,
+
+            3, 4, 10,
+            11, 10, 4,
+
+            4, 5, 12,
+            12, 11, 4,
+
+            0, 7, 5,
+            7, 12, 5,
+        };
+
+        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
+
+        mesh.vertices = LVertices;
+        mesh.triangles = LTriangles;
+        mesh.RecalculateNormals();
+    }
 }
