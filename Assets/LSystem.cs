@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -14,6 +16,10 @@ public class LSystem : MonoBehaviour
     private string nextString = "";
     private Vector3 currentPosition;
 
+    public List<char> initialShape;
+    public List<int> floorNum;
+    public List<char> roofType;
+
     public GameObject prefabs;
 
     public Material colorMaterial;
@@ -21,12 +27,13 @@ public class LSystem : MonoBehaviour
     void Start()
     {
         currentPosition = Vector3.zero;
-        GenerateLSystem();
+        ParseAndGeneratePatterns(axiom);
     }
 
     void GenerateLSystem()
     {
         currentString = axiom;
+        ParseAndGeneratePatterns(currentString);
 
         currentPosition = transform.position;
         for (int i = 0; i < iterations; i++)
@@ -57,13 +64,81 @@ public class LSystem : MonoBehaviour
                 }
                 else if (currentChar == 'A')
                 {
-                    Uroof2(3, 3, 1, 1, 1, 0);
+                    RCRoof2(3, 3, 1, 1, 1, 0);
                 }
             }
         }
         // string prefabPath = "Assets/Prefabs/" + gameObject.name + ".prefab";
         // PrefabUtility.SaveAsPrefabAsset(gameObject, prefabPath);
         // Debug.Log("Prefab saved at: " + prefabPath);
+    }
+    
+    public void ParseAndGeneratePatterns(string userInput)
+    {
+        int currentIndex = 0;
+
+        while (currentIndex < userInput.Length)
+        {
+            string currentPattern = ExtractPattern(userInput, ref currentIndex);
+            GeneratePattern(currentPattern);
+        }
+    }
+    
+    public string ExtractPattern(string userInput, ref int currentIndex)
+    {
+        StringBuilder patternBuilder = new StringBuilder();
+
+        // Extract the first shape 'X' or 'Y'
+        patternBuilder.Append(userInput[currentIndex]);
+        currentIndex++;
+
+        // Extract the number part 'Y'
+        while (currentIndex < userInput.Length && char.IsDigit(userInput[currentIndex]))
+        {
+            patternBuilder.Append(userInput[currentIndex]);
+            currentIndex++;
+        }
+
+        // Extract the second shape 'Z'
+        patternBuilder.Append(userInput[currentIndex]);
+        currentIndex++;
+
+        return patternBuilder.ToString();
+    }
+
+    public void GeneratePattern(string pattern)
+    {
+        char firstShape = pattern[0];
+        initialShape.Add(firstShape);
+
+        // Extract the number 'Y' from the pattern
+        int yIndex = 1;
+        while (yIndex < pattern.Length && char.IsDigit(pattern[yIndex]))
+        {
+            yIndex++;
+        }
+
+        if (!int.TryParse(pattern.Substring(1, yIndex - 1), out int duplicationCount))
+        {
+            Console.WriteLine("Invalid duplication count in pattern: " + pattern);
+            return;
+        }
+        
+        floorNum.Add(duplicationCount);
+
+        char topShape = pattern[yIndex];
+        roofType.Add(topShape);
+
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < duplicationCount; i++)
+        {
+            result.Append(firstShape);
+        }
+
+        result.Append(topShape);
+
+        Console.WriteLine("Generated pattern: " + result.ToString());
     }
     
     void UpdatePosition(Vector3 lastPos)
@@ -608,6 +683,7 @@ public class LSystem : MonoBehaviour
         meshFilter.mesh = mesh;
         meshRenderer.material = colorMaterial;
 
+        float tempInnerLength = (_length - _innerLength) / 2;
         Quaternion rotation = transform.rotation;
         
         Vector3[] LVertices = new Vector3[]
@@ -619,12 +695,9 @@ public class LSystem : MonoBehaviour
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
 
-            new Vector3(currentPosition.x, _height, currentPosition.z), //6
-            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //7
-            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //8 -
-            new Vector3(currentPosition.x + _innerLength, _height, _width), //9 -
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //10 
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //11
+            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)/2),  //6
+            new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height, currentPosition.z + (_width - _innerWidth)/2),  //7
+            new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height, currentPosition.z + _width),  //8
         };
 
         // Define the triangles to form the cube's faces
@@ -635,34 +708,192 @@ public class LSystem : MonoBehaviour
             4, 0 ,5,
             4, 2, 0,
             
-            7, 8, 6,
-            9, 10 , 8,
-            10, 11, 6,
-            10, 6, 8,
-
-            0, 1, 7,
-            0, 7, 6,
-
-            1, 2, 8,
-            1, 8, 7,
-
-            2, 3, 8,
-            3, 9, 8,
-
-            3, 4, 9,
-            10, 9, 4,
-
-            4, 5, 11,
-            11, 10, 4,
-
-            6, 5, 0,
-            6, 11, 5,
+            0, 6, 1,
+            
+            2, 7, 6,
+            2, 6, 1,
+            
+            0, 6, 7,
+            0, 7, 5,
+            
+            3, 7, 2,
+            3, 8, 7,
+            
+            4, 5, 7,
+            4, 7, 8,
+            
+            3, 4, 8,
         };
 
         UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
 
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
+        mesh.RecalculateNormals();
+    }
+    
+    public void LRoof2(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    {
+        GameObject LBuilding = new GameObject("LRoof");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = LBuilding.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = LBuilding.AddComponent<MeshRenderer>();
+        
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
+
+        float tempInnerLength = (_length - _innerLength) / 2;
+        Quaternion rotation = transform.rotation;
+        
+        Vector3[] LVertices = new Vector3[]
+        {
+            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //1 
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //2 -
+            new Vector3(currentPosition.x + _innerLength, _dasar, _width), //3 -
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
+
+            new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height, currentPosition.z + (_width - _innerWidth)/2),  //6
+        };
+
+        // Define the triangles to form the cube's faces
+        int[] LTriangles = new int[]
+        {
+            1, 0, 2,
+            3, 2, 4,
+            4, 0 ,5,
+            4, 2, 0,
+            
+            0, 1, 6,
+            
+            2, 6, 1,
+            
+            3, 6, 2,
+            
+            4, 6, 3,
+            
+            5, 6, 4,
+            
+            0, 6, 5,
+        };
+
+        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
+
+        mesh.vertices = LVertices;
+        mesh.triangles = LTriangles;
+        mesh.RecalculateNormals();
+    }
+    
+    public void RCRoof1(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    {
+        GameObject RCBuilding = new GameObject("RCBuilding");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = RCBuilding.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = RCBuilding.AddComponent<MeshRenderer>();
+        
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
+
+        Quaternion rotation = transform.rotation;
+        
+        // Define the vertices of the cube
+        Vector3[] RCVertices = new Vector3[]
+        {
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z), //0
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //1 
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //2
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //3 
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + _innerWidth), //5
+    
+            new Vector3(currentPosition.x + _innerLength/2, _height, currentPosition.z + _innerWidth/2), //6
+            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + _innerWidth), //7
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //2
+        };
+
+        // Define the triangles to form the cube's faces
+        int[] RCTriangles = new int[]
+        {
+            0, 5, 4,
+            1, 2, 3,
+            5, 0, 1,
+            5, 3, 4,
+            1, 3, 5,
+
+            0, 4, 6,
+            
+            3, 7, 6,
+            3, 6, 4,
+            
+            1, 6, 7,
+            1, 0, 6,
+            
+            2, 8, 3,
+            3, 8, 7,
+            
+            1, 8, 2,
+            1, 7, 8,
+        };
+
+        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
+                
+        mesh.vertices = RCVertices;
+        mesh.triangles = RCTriangles;
+        mesh.RecalculateNormals();
+    }
+    
+    public void RCRoof2(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    {
+        GameObject RCBuilding = new GameObject("RCBuilding");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = RCBuilding.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = RCBuilding.AddComponent<MeshRenderer>();
+        
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
+
+        Quaternion rotation = transform.rotation;
+        
+        // Define the vertices of the cube
+        Vector3[] RCVertices = new Vector3[]
+        {
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z), //0
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //1 
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //2
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //3 
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + _innerWidth), //5
+    
+            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + _innerWidth), //6
+        };
+
+        // Define the triangles to form the cube's faces
+        int[] RCTriangles = new int[]
+        {
+            0, 5, 4,
+            1, 2, 3,
+            5, 0, 1,
+            5, 3, 4,
+            1, 3, 5,
+
+            4, 6, 0,
+            3, 6, 4,
+            2, 6, 3,
+            1, 6, 2,
+            0, 6, 1,
+        };
+
+        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
+                
+        mesh.vertices = RCVertices;
+        mesh.triangles = RCTriangles;
         mesh.RecalculateNormals();
     }
 }
