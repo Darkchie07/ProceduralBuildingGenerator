@@ -30,11 +30,6 @@ public class LSystem : MonoBehaviour
     void Start()
     {
         currentPosition = Vector3.zero;
-        ParseAndGeneratePatterns(axiom);
-        if (initialShape.Count == floorNum.Count && floorNum.Count == roofType.Count && CheckShape() && CheckRoof())
-        {
-            GenerateLSystem();
-        }
     }
 
     void GenerateLSystem()
@@ -149,96 +144,6 @@ public class LSystem : MonoBehaviour
         // Debug.Log("Prefab saved at: " + prefabPath);
     }
 
-    public bool CheckShape()
-    {
-        foreach (char character in initialShape)
-        {
-            if (!validShape.Contains(character))
-            {
-                return false; // Invalid character found
-            }
-        }
-        return true;
-    }
-    
-    public bool CheckRoof()
-    {
-        foreach (char character in roofType)
-        {
-            if (!validRoof.Contains(character))
-            {
-                return false; // Invalid character found
-            }
-        }
-        return true;
-    }
-    
-    public void ParseAndGeneratePatterns(string userInput)
-    {
-        int currentIndex = 0;
-
-        while (currentIndex < userInput.Length)
-        {
-            string currentPattern = ExtractPattern(userInput, ref currentIndex);
-            GeneratePattern(currentPattern);
-        }
-    }
-    
-    public string ExtractPattern(string userInput, ref int currentIndex)
-    {
-        StringBuilder patternBuilder = new StringBuilder();
-
-        // Extract the first shape 'X' or 'Y'
-        patternBuilder.Append(userInput[currentIndex]);
-        currentIndex++;
-
-        // Extract the number part 'Y'
-        while (currentIndex < userInput.Length && char.IsDigit(userInput[currentIndex]))
-        {
-            patternBuilder.Append(userInput[currentIndex]);
-            currentIndex++;
-        }
-
-        // Extract the second shape 'Z'
-        patternBuilder.Append(userInput[currentIndex]);
-        currentIndex++;
-
-        return patternBuilder.ToString();
-    }
-
-    public void GeneratePattern(string pattern)
-    {
-        char firstShape = pattern[0];
-        initialShape.Add(firstShape);
-
-        // Extract the number 'Y' from the pattern
-        int yIndex = 1;
-        while (yIndex < pattern.Length && char.IsDigit(pattern[yIndex]))
-        {
-            yIndex++;
-        }
-
-        if (!int.TryParse(pattern.Substring(1, yIndex - 1), out int duplicationCount))
-        {
-            Console.WriteLine("Invalid duplication count in pattern: " + pattern);
-            return;
-        }
-        
-        floorNum.Add(duplicationCount);
-
-        char topShape = pattern[yIndex];
-        roofType.Add(topShape);
-
-        StringBuilder result = new StringBuilder();
-
-        for (int i = 0; i < duplicationCount; i++)
-        {
-            result.Append(firstShape);
-        }
-
-        result.Append(topShape);
-    }
-    
     void UpdatePosition(Vector3 lastPos)
     {
         Quaternion rotation = transform.rotation;
