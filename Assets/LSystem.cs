@@ -19,6 +19,9 @@ public class LSystem : MonoBehaviour
     public List<char> initialShape;
     public List<int> floorNum;
     public List<char> roofType;
+    
+    List<char> validShape = new List<char> { 'A', 'B', 'C', 'D' };
+    List<char> validRoof = new List<char> { 'X', 'Y' };
 
     public GameObject prefabs;
 
@@ -28,49 +31,146 @@ public class LSystem : MonoBehaviour
     {
         currentPosition = Vector3.zero;
         ParseAndGeneratePatterns(axiom);
+        if (initialShape.Count == floorNum.Count && floorNum.Count == roofType.Count && CheckShape() && CheckRoof())
+        {
+            GenerateLSystem();
+        }
     }
 
     void GenerateLSystem()
     {
-        currentString = axiom;
-        ParseAndGeneratePatterns(currentString);
-
         currentPosition = transform.position;
-        for (int i = 0; i < iterations; i++)
+        for (int i = 0; i < initialShape.Count; i++)
         {
-            nextString = "";
-            char[] currentChars = currentString.ToCharArray();
-            for (int j = 0; j < currentChars.Length; j++)
+            float tempheight = 1;
+            float tempDasar = 0;
+            if (initialShape[i] == 'A')
             {
-                char currentChar = currentChars[j];
-                Debug.Log(currentChar == 'F');
-                if (currentChar == 'F')
+                for (int j = 0; j < floorNum[i]; j++)
                 {
-                    CreateCubeMesh(3, 1, 1);
+                    CreateCubeMesh(3, 1, tempheight, tempDasar);
+                    tempheight += 1;
+                    tempDasar += 1;
                 }
-                else if (currentChar == 'T')
+
+                if (roofType[i] == 'X')
                 {
-                    CreatePyramid(3, 2, 1);
+                    CreatePyramid(3, 1, tempheight, tempDasar);
                 }
-                else if (currentChar == 'U')
+                UpdatePosition(new Vector3(3, 0, currentPosition.z));
+            }else if (initialShape[i] == 'B')
+            {
+                for (int j = 0; j < floorNum[i]; j++)
                 {
-                    CreateUBuilding(3, 3, 1, 1, 1, 0);
-                }else if (currentChar == 'L')
-                {
-                    CreateLBuilding(3, 3, 1, 1, 1, 0);
-                }else if (currentChar == 'R')
-                {
-                    CreateRCBuilding(3, 3, 1, 1, 1, 0);
+                    CreateUBuilding(3, 3, tempheight, 1, 1, tempDasar);
+                    tempheight += 1;
+                    tempDasar += 1;
                 }
-                else if (currentChar == 'A')
+
+                if (roofType[i] == 'X')
                 {
-                    RCRoof2(3, 3, 1, 1, 1, 0);
+                    Uroof1(3, 3, tempheight, 1, 1, tempDasar);
+                }else if(roofType[i] == 'Y')
+                {
+                    Uroof2(3, 3, tempheight, 1, 1, tempDasar);
                 }
+                UpdatePosition(new Vector3(3, 0, currentPosition.z));
+            }else if (initialShape[i] == 'C')
+            {
+                for (int j = 0; j < floorNum[i]; j++)
+                {
+                    CreateLBuilding(3, 3, tempheight, 1, 1, tempDasar);
+                    tempheight += 1;
+                    tempDasar += 1;
+                }
+
+                if (roofType[i] == 'X')
+                {
+                    LRoof1(3, 3, tempheight, 1, 1, tempDasar);
+                }else if(roofType[i] == 'Y')
+                {
+                    LRoof2(3, 3, tempheight, 1, 1, tempDasar);
+                }
+                UpdatePosition(new Vector3(3, 0, currentPosition.z));
+            }else if (initialShape[i] == 'D')
+            {
+                for (int j = 0; j < floorNum[i]; j++)
+                {
+                    CreateRCBuilding(3, 3, tempheight, 1, 1, tempDasar);
+                    tempheight += 1;
+                    tempDasar += 1;
+                }
+
+                if (roofType[i] == 'X')
+                {
+                    RCRoof1(3, 3, tempheight, 1, 1, tempDasar);
+                }else if(roofType[i] == 'Y')
+                {
+                    RCRoof2(3, 3, tempheight, 1, 1, tempDasar);
+                }
+                UpdatePosition(new Vector3(3, 0, currentPosition.z));
             }
         }
+        // currentPosition = transform.position;
+        // for (int i = 0; i < iterations; i++)
+        // {
+        //     nextString = "";
+        //     char[] currentChars = currentString.ToCharArray();
+        //     for (int j = 0; j < currentChars.Length; j++)
+        //     {
+        //         char currentChar = currentChars[j];
+        //         Debug.Log(currentChar == 'F');
+        //         if (currentChar == 'F')
+        //         {
+        //             CreateCubeMesh(3, 1, 1);
+        //         }
+        //         else if (currentChar == 'T')
+        //         {
+        //             CreatePyramid(3, 2, 1);
+        //         }
+        //         else if (currentChar == 'U')
+        //         {
+        //             CreateUBuilding(3, 3, 1, 1, 1, 0);
+        //         }else if (currentChar == 'L')
+        //         {
+        //             CreateLBuilding(3, 3, 1, 1, 1, 0);
+        //         }else if (currentChar == 'R')
+        //         {
+        //             CreateRCBuilding(3, 3, 1, 1, 1, 0);
+        //         }
+        //         else if (currentChar == 'A')
+        //         {
+        //             RCRoof2(3, 3, 1, 1, 1, 0);
+        //         }
+        //     }
+        // }
         // string prefabPath = "Assets/Prefabs/" + gameObject.name + ".prefab";
         // PrefabUtility.SaveAsPrefabAsset(gameObject, prefabPath);
         // Debug.Log("Prefab saved at: " + prefabPath);
+    }
+
+    public bool CheckShape()
+    {
+        foreach (char character in initialShape)
+        {
+            if (!validShape.Contains(character))
+            {
+                return false; // Invalid character found
+            }
+        }
+        return true;
+    }
+    
+    public bool CheckRoof()
+    {
+        foreach (char character in roofType)
+        {
+            if (!validRoof.Contains(character))
+            {
+                return false; // Invalid character found
+            }
+        }
+        return true;
     }
     
     public void ParseAndGeneratePatterns(string userInput)
@@ -137,8 +237,6 @@ public class LSystem : MonoBehaviour
         }
 
         result.Append(topShape);
-
-        Console.WriteLine("Generated pattern: " + result.ToString());
     }
     
     void UpdatePosition(Vector3 lastPos)
@@ -209,7 +307,6 @@ public class LSystem : MonoBehaviour
         };
 
         Debug.Log(tempLenght);
-        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
 
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
@@ -275,7 +372,6 @@ public class LSystem : MonoBehaviour
         };
 
         Debug.Log(tempLenght);
-        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
 
         mesh.vertices = pyramidVertices;
         mesh.triangles = pyramidTriangles;
@@ -367,8 +463,6 @@ public class LSystem : MonoBehaviour
         6, 17, 7,
         6, 16, 17,
         };
-        
-        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
 
         mesh.vertices = uVertices;
         mesh.triangles = uTriangles;
@@ -450,8 +544,6 @@ public class LSystem : MonoBehaviour
             6, 11, 5,
         };
 
-        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
-
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
@@ -519,8 +611,6 @@ public class LSystem : MonoBehaviour
             3, 10, 4,
             3, 9, 10,
         };
-
-        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
                 
         mesh.vertices = RCVertices;
         mesh.triangles = RCTriangles;
@@ -725,8 +815,6 @@ public class LSystem : MonoBehaviour
             3, 4, 8,
         };
 
-        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
-
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
@@ -779,8 +867,6 @@ public class LSystem : MonoBehaviour
             
             0, 6, 5,
         };
-
-        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
 
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
@@ -839,8 +925,6 @@ public class LSystem : MonoBehaviour
             1, 8, 2,
             1, 7, 8,
         };
-
-        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
                 
         mesh.vertices = RCVertices;
         mesh.triangles = RCTriangles;
@@ -889,8 +973,6 @@ public class LSystem : MonoBehaviour
             1, 6, 2,
             0, 6, 1,
         };
-
-        UpdatePosition(new Vector3(_length, _dasar, currentPosition.z));
                 
         mesh.vertices = RCVertices;
         mesh.triangles = RCTriangles;
