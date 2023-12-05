@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -7,28 +9,36 @@ using UnityEngine;
 public class UIInput : MonoBehaviour
 {
     public TMP_InputField axiom;
+    public Transform parents;
     public GameObject inputBuild1;
     public GameObject inputBuild2;
     public List<char> initialShape;
     public List<int> floorNum;
     public List<char> roofType;
+    public List<float> _paramLength;
+    public List<float> _paramWidth;
+    public List<float> _paramHeight;
+    public List<float> _paramInnerLength;
+    public List<float> _paramInnerWidth;
+
+    public GameObject errorPanel;
+    public GameObject inputPanel;
     
     List<char> validShape = new List<char> { 'A', 'B', 'C', 'D' };
     List<char> validRoof = new List<char> { 'X', 'Y' };
     // Start is called before the first frame update
-    void Start()
+    public void Next()
     {
         ParseAndGeneratePatterns(axiom.text);
         if (initialShape.Count == floorNum.Count && floorNum.Count == roofType.Count && CheckShape() && CheckRoof())
         {
-            //
+            inputPanel.SetActive(true);
+            SetInputField();
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        else
+        {
+            errorPanel.SetActive(true);
+        }
     }
     
     public bool CheckShape()
@@ -62,7 +72,10 @@ public class UIInput : MonoBehaviour
         while (currentIndex < userInput.Length)
         {
             string currentPattern = ExtractPattern(userInput, ref currentIndex);
-            GeneratePattern(currentPattern);
+            if (currentPattern != null)
+            {
+                GeneratePattern(currentPattern);
+            }
         }
     }
     
@@ -70,22 +83,29 @@ public class UIInput : MonoBehaviour
     {
         StringBuilder patternBuilder = new StringBuilder();
 
-        // Extract the first shape 'X' or 'Y'
-        patternBuilder.Append(userInput[currentIndex]);
-        currentIndex++;
-
-        // Extract the number part 'Y'
-        while (currentIndex < userInput.Length && char.IsDigit(userInput[currentIndex]))
+        try
         {
+            // Extract the first shape 'X' or 'Y'
             patternBuilder.Append(userInput[currentIndex]);
             currentIndex++;
+
+            // Extract the number part 'Y'
+            while (currentIndex < userInput.Length && char.IsDigit(userInput[currentIndex]))
+            {
+                patternBuilder.Append(userInput[currentIndex]);
+                currentIndex++;
+            }
+
+            // Extract the second shape 'Z'
+            patternBuilder.Append(userInput[currentIndex]);
+            currentIndex++;
+
+            return patternBuilder.ToString();
         }
-
-        // Extract the second shape 'Z'
-        patternBuilder.Append(userInput[currentIndex]);
-        currentIndex++;
-
-        return patternBuilder.ToString();
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     public void GeneratePattern(string pattern)
@@ -122,6 +142,34 @@ public class UIInput : MonoBehaviour
 
     public void SetInputField()
     {
-         
+        for (int i = 0; i < initialShape.Count; i++)
+        {
+            if (initialShape[i] == 'A')
+            {
+                Instantiate(inputBuild1, parents.transform);
+            }
+            else
+            {
+                Instantiate(inputBuild2, parents.transform);
+            }
+        }
+    }
+
+    public void GetParameter()
+    {
+        GameObject[] length = GameObject.FindGameObjectsWithTag("Length");
+        GameObject[] width = GameObject.FindGameObjectsWithTag("Width");
+        GameObject[] height = GameObject.FindGameObjectsWithTag("Height");
+        GameObject[] innerLength = GameObject.FindGameObjectsWithTag("innerLength");
+        GameObject[] innerWidth = GameObject.FindGameObjectsWithTag("innerWidth");
+
+        for (int i = 0; i < initialShape.Count; i++)
+        {
+            _paramLength.Add(float.Parse(length[i].GetComponent<TMP_InputField>().text));
+            _paramWidth.Add(float.Parse(width[i].GetComponent<TMP_InputField>().text));
+            _paramHeight.Add(float.Parse(height[i].GetComponent<TMP_InputField>().text));
+            _paramInnerLength.Add(float.Parse(innerLength[i].GetComponent<TMP_InputField>().text));
+            _paramInnerWidth.Add(float.Parse(innerWidth[i].GetComponent<TMP_InputField>().text));
+        }
     }
 }
