@@ -171,5 +171,29 @@ public class UIInput : MonoBehaviour
             _paramInnerLength.Add(float.Parse(innerLength[i].GetComponent<TMP_InputField>().text));
             _paramInnerWidth.Add(float.Parse(innerWidth[i].GetComponent<TMP_InputField>().text));
         }
+
+        if (CheckValidParameter())
+        {
+            // Instantiate an empty GameObject
+            GameObject emptyGameObject = new GameObject("EmptyGameObject");
+
+            // You can also set the position, rotation, and parent if needed
+            emptyGameObject.transform.position = new Vector3(0f, 0f, 0f);
+            emptyGameObject.transform.rotation = Quaternion.identity;
+            LSystem lSystem = emptyGameObject.AddComponent<LSystem>();
+            lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth);
+        }
+    }
+
+    public bool CheckValidParameter()
+    {
+        for (int i = 0; i < _paramLength.Count; i++)
+        {
+            if (_paramLength[i] < _paramInnerLength[i] && _paramWidth[i] < _paramInnerWidth[i])
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }

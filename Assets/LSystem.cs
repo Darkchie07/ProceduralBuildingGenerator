@@ -19,6 +19,11 @@ public class LSystem : MonoBehaviour
     public List<char> initialShape;
     public List<int> floorNum;
     public List<char> roofType;
+    public List<float> ParamLength;
+    public List<float> ParamWidth;
+    public List<float> ParamHeight;
+    public List<float> ParamInnerLength;
+    public List<float> ParamInnerWidth;
     
     List<char> validShape = new List<char> { 'A', 'B', 'C', 'D' };
     List<char> validRoof = new List<char> { 'X', 'Y' };
@@ -30,6 +35,18 @@ public class LSystem : MonoBehaviour
     void Start()
     {
         currentPosition = Vector3.zero;
+        GenerateLSystem();
+    }
+    public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth)
+    {
+        initialShape = _initialShape;
+        floorNum = _floorNum;
+        roofType = _roofType;
+        ParamLength = _paramLength;
+        ParamWidth = _paramWidth;
+        ParamHeight = _paramHeight;
+        ParamInnerLength = _paramInnerLength;
+        ParamInnerWidth = _paramInnerWidth;
     }
 
     void GenerateLSystem()
@@ -37,73 +54,73 @@ public class LSystem : MonoBehaviour
         currentPosition = transform.position;
         for (int i = 0; i < initialShape.Count; i++)
         {
-            float tempheight = 1;
+            float tempheight = ParamHeight[i];
             float tempDasar = 0;
             if (initialShape[i] == 'A')
             {
                 for (int j = 0; j < floorNum[i]; j++)
                 {
-                    CreateCubeMesh(3, 1, tempheight, tempDasar);
-                    tempheight += 1;
-                    tempDasar += 1;
+                    CreateCubeMesh(ParamLength[i], ParamWidth[i], tempheight, tempDasar);
+                    tempheight += ParamHeight[i];
+                    tempDasar += ParamHeight[i];
                 }
 
                 if (roofType[i] == 'X')
                 {
-                    CreatePyramid(3, 1, tempheight, tempDasar);
+                    CreatePyramid(ParamLength[i], ParamWidth[i], tempheight, tempDasar);
                 }
-                UpdatePosition(new Vector3(3, 0, currentPosition.z));
+                UpdatePosition(new Vector3(ParamLength[i], 0, currentPosition.z));
             }else if (initialShape[i] == 'B')
             {
                 for (int j = 0; j < floorNum[i]; j++)
                 {
-                    CreateUBuilding(3, 3, tempheight, 1, 1, tempDasar);
-                    tempheight += 1;
-                    tempDasar += 1;
+                    CreateUBuilding(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
+                    tempheight += ParamHeight[i];
+                    tempDasar += ParamHeight[i];
                 }
 
                 if (roofType[i] == 'X')
                 {
-                    Uroof1(3, 3, tempheight, 1, 1, tempDasar);
+                    Uroof1(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
                 }else if(roofType[i] == 'Y')
                 {
-                    Uroof2(3, 3, tempheight, 1, 1, tempDasar);
+                    Uroof2(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
                 }
-                UpdatePosition(new Vector3(3, 0, currentPosition.z));
+                UpdatePosition(new Vector3(ParamLength[i], 0, currentPosition.z));
             }else if (initialShape[i] == 'C')
             {
                 for (int j = 0; j < floorNum[i]; j++)
                 {
-                    CreateLBuilding(3, 3, tempheight, 1, 1, tempDasar);
-                    tempheight += 1;
-                    tempDasar += 1;
+                    CreateLBuilding(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
+                    tempheight += ParamHeight[i];
+                    tempDasar += ParamHeight[i];
                 }
 
                 if (roofType[i] == 'X')
                 {
-                    LRoof1(3, 3, tempheight, 1, 1, tempDasar);
+                    LRoof1(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
                 }else if(roofType[i] == 'Y')
                 {
-                    LRoof2(3, 3, tempheight, 1, 1, tempDasar);
+                    LRoof2(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
                 }
-                UpdatePosition(new Vector3(3, 0, currentPosition.z));
+                UpdatePosition(new Vector3(ParamLength[i], 0, currentPosition.z));
             }else if (initialShape[i] == 'D')
             {
                 for (int j = 0; j < floorNum[i]; j++)
                 {
-                    CreateRCBuilding(3, 3, tempheight, 1, 1, tempDasar);
-                    tempheight += 1;
-                    tempDasar += 1;
+                    CreateRCBuilding(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
+                    tempheight += ParamHeight[i];
+                    tempDasar += ParamHeight[i];
                 }
 
                 if (roofType[i] == 'X')
                 {
-                    RCRoof1(3, 3, tempheight, 1, 1, tempDasar);
+                    RCRoof1(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
                 }else if(roofType[i] == 'Y')
                 {
-                    RCRoof2(3, 3, tempheight, 1, 1, tempDasar);
+                    RCRoof2(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
                 }
-                UpdatePosition(new Vector3(3, 0, currentPosition.z));
+                UpdatePosition(new Vector3(ParamLength[i], 0, currentPosition.z));
             }
         }
         // currentPosition = transform.position;
