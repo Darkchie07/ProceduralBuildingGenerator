@@ -233,10 +233,6 @@ public class LSystem : MonoBehaviour
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
-
-        Instantiate(prefabs, cube.transform);
-
-        Debug.Log("Cube");
     }
     
     public void CreatePyramid(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
@@ -271,6 +267,69 @@ public class LSystem : MonoBehaviour
 
             // Back face
             new Vector3(centerX, _height, centerZ),
+        };
+
+        // Define the triangles to form the cube's faces
+        int[] pyramidTriangles = new int[]
+        {
+            // Bottom face
+            0, 2, 1,
+            0, 3, 2,
+
+            // Front face
+            0, 1, 4,
+            
+            // Back face
+            1, 2, 4,
+            
+            // Left face
+            2, 3, 4,
+            
+            // Right face
+            3, 0, 4,
+        };
+
+        Debug.Log(tempLenght);
+
+        mesh.vertices = pyramidVertices;
+        mesh.triangles = pyramidTriangles;
+        // Optionally, calculate normals
+        mesh.RecalculateNormals();
+    }
+    
+    public void CRoof2(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
+    {
+        // Create a new pyramid GameObject
+        GameObject pyramid = new GameObject("Pyramid");
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = pyramid.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = pyramid.AddComponent<MeshRenderer>();
+
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+        meshRenderer.material = colorMaterial;
+
+        Quaternion rotation = transform.rotation;
+
+        float tempLenght = currentPosition.x + _length;  
+        float tempLengthX = _length / 2;
+        float tempWidth = _width / 2;
+
+        float centerX = tempLengthX + currentPosition.x;
+        float centerZ = tempWidth + currentPosition.z;
+
+        Vector3[] pyramidVertices = new Vector3[]
+        {
+            // Front face
+            new Vector3(currentPosition.x, _dasar, currentPosition.z),
+            new Vector3(currentPosition.x, _dasar, _width),
+            new Vector3(tempLenght, _dasar, _width),
+            new Vector3(tempLenght, _dasar, currentPosition.z),
+
+            // Back face
+            new Vector3(currentPosition.x, _height, centerZ),
+            new Vector3(tempLenght, _height, centerZ),
         };
 
         // Define the triangles to form the cube's faces
