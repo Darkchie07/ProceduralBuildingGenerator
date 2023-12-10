@@ -22,66 +22,66 @@ public class LSystemHouseGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        currentPosition = Vector3.zero;
-        CreateXCube(4, 5);
-        CreateZCube(2, 3);
-    }
+        string inputString = "FF(l, w)D+FX(a, l, x)W-FY(a, l, x)FFDFFX(a, l, x)W-FY(a, l, x)B";
 
-    IEnumerator GenerateLSystem()
-    {
-        currentString = axiom;
+        // Use custom split method to split the input string
+        string[] components = SplitComponents(inputString);
 
-        for (int i = 0; i < iterations; i++)
+        // Output the separated components
+        foreach (string component in components)
         {
-            currentString = ApplyRules(currentString);
-            yield return null; // Wait for one frame
+            Debug.Log(component);
         }
-
-        InterpretLSystem();
     }
 
-    string ApplyRules(string input)
+    string[] SplitComponents(string input)
     {
-        StringBuilder result = new StringBuilder();
+        List<string> components = new List<string>();
+        string currentComponent = "";
+        int parenthesisCount = 0;
 
-        foreach (char c in input)
+        for (int i = 0; i < input.Length; i++)
         {
-            // Apply L-system rules
-            switch (c)
+            char c = input[i];
+
+            if (c == '(')
             {
-                case 'F':
-                    result.Append("F+F+F+F-F-F-F-F+F");
-                    break;
-                default:
-                    result.Append(c);
-                    break;
+                parenthesisCount++;
+            }
+            else if (c == ')')
+            {
+                parenthesisCount--;
+            }
+
+            if ((c == '+' || c == '-') && parenthesisCount == 0)
+            {
+                components.Add(currentComponent.Trim());
+                currentComponent = c.ToString();
+            }
+            else if (c == 'F')
+            {
+                if (currentComponent.Length > 0)
+                {
+                    components.Add(currentComponent.Trim());
+                    currentComponent = "F";
+                }
+                else
+                {
+                    currentComponent += c;
+                }
+            }
+            else
+            {
+                currentComponent += c;
             }
         }
 
-        return result.ToString();
-    }
-
-    void InterpretLSystem()
-    {
-        foreach (char c in currentString)
+        if (!string.IsNullOrEmpty(currentComponent))
         {
-            // Interpret L-system symbols and create corresponding geometry
-            switch (c)
-            {
-                case 'F':
-                    // Move forward and instantiate a wall
-                    transform.Translate(Vector3.forward * wallLength);
-                    break;
-                case '+':
-                    // Rotate clockwise
-                    transform.Rotate(Vector3.up * 90f);
-                    break;
-                case '-':
-                    // Rotate counterclockwise
-                    transform.Rotate(Vector3.up * -90f);
-                    break;
-            }
+            components.Add(currentComponent.Trim());
         }
+
+        return components.ToArray();
     }
     
     void UpdatePosition(Vector3 lastPos)
@@ -226,16 +226,17 @@ public class LSystemHouseGenerator : MonoBehaviour
 
         Quaternion rotation = transform.rotation;
 
-        CalculateHeight(_length, 25);
+        float tempAdjacent = CalculateAdjacent(_width, 45);
+        float tempHeight = CalculateHeight(_width, 45);
 
         // Define the vertices of the cube
         Vector3[] cubeVertices = new Vector3[]
         {
             // Front face
             new Vector3(currentPosition.x, currentPosition.y, currentPosition.z),
-            new Vector3(currentPosition.x, currentPosition.y + _width , currentPosition.z),
-            new Vector3(currentPosition.x, currentPosition.y + _width , currentPosition.z + _length),
-            new Vector3(currentPosition.x, currentPosition.y, currentPosition.z + _length),
+            new Vector3(currentPosition.x, currentPosition.y + tempHeight, currentPosition.z + tempAdjacent),
+            new Vector3(currentPosition.x + _length, currentPosition.y + tempHeight , currentPosition.z + tempAdjacent),
+            new Vector3(currentPosition.x + _length, currentPosition.y, currentPosition.z),
         };
 
         // Define triangles for the cube
@@ -251,6 +252,17 @@ public class LSystemHouseGenerator : MonoBehaviour
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
+    }
+    
+    float CalculateAdjacent(float hypotenuse, float angleBaseDegrees)
+    {
+        // Convert angle from degrees to radians
+        float angleBaseRadians = Mathf.Deg2Rad * angleBaseDegrees;
+
+        // Use cosine function to calculate adjacent length
+        float adjacentLength = hypotenuse * Mathf.Cos(angleBaseRadians);
+
+        return adjacentLength;
     }
     
     float CalculateHeight(float hypotenuse, float angleBaseDegrees)
