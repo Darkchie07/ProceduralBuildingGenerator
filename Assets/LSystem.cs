@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using Color = System.Drawing.Color;
 
 public class LSystem : MonoBehaviour
 {
@@ -35,7 +38,7 @@ public class LSystem : MonoBehaviour
     void Start()
     {
         currentPosition = Vector3.zero;
-        GenerateLSystem();
+        CreateUBuilding(6, 4, 4, 2, 2);
     }
     public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth)
     {
@@ -167,8 +170,8 @@ public class LSystem : MonoBehaviour
         Debug.Log(currentPosition);
         currentPosition += rotation * lastPos;
     }
-    
-    void CreateCubeMesh(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
+
+    void CreateCubeMesh(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f, float _doorWidth = 0f)
     {
         // Create a new cube GameObject
         GameObject cube = new GameObject("Cube");
@@ -184,6 +187,7 @@ public class LSystem : MonoBehaviour
         Quaternion rotation = transform.rotation;
 
         float tempLenght = currentPosition.x + _length;  
+        float doorStart = (currentPosition.x + _length)/2;
         // Define the vertices of the cube
         Vector3[] cubeVertices = new Vector3[]
         {
@@ -229,10 +233,48 @@ public class LSystem : MonoBehaviour
         };
 
         Debug.Log(tempLenght);
+        
+        AddDoorToCube(doorStart, _doorWidth, _height/2, cube);
 
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
+    }
+    
+    void AddDoorToCube(float doorStart, float doorWidth, float height, GameObject parent)
+    {
+        // Create a new door GameObject
+        GameObject doorObject = new GameObject("Door");
+        doorObject.transform.SetParent(parent.transform);
+
+        // Add MeshFilter and MeshRenderer components
+        MeshFilter meshFilter = doorObject.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = doorObject.AddComponent<MeshRenderer>();
+
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+        meshRenderer.material.color = UnityEngine.Color.black; // You can change this material as needed
+
+        // Define the vertices for the door
+        Vector3[] doorVertices = new Vector3[]
+        {
+            new Vector3(doorStart - doorWidth/2, currentPosition.y, currentPosition.z - 0.001f),
+            new Vector3(doorStart - doorWidth/2, currentPosition.y + height, currentPosition.z  - 0.001f),
+            new Vector3(doorStart + doorWidth/2, currentPosition.y + height, currentPosition.z  - 0.001f),
+            new Vector3(doorStart + doorWidth/2, currentPosition.y, currentPosition.z  - 0.001f),
+        };
+
+        // Define triangles for the door
+        int[] doorTriangles = new int[]
+        {
+            0, 1, 2,
+            0, 2, 3,
+        };
+
+        mesh.vertices = doorVertices;
+        mesh.triangles = doorTriangles;
+        mesh.RecalculateNormals();
+        meshRenderer.material.renderQueue = 3000; 
     }
     
     public void CreatePyramid(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
@@ -448,6 +490,63 @@ public class LSystem : MonoBehaviour
         mesh.vertices = uVertices;
         mesh.triangles = uTriangles;
         mesh.RecalculateNormals();
+        
+        Vector3[] trimmedArray = TrimArray(uVertices, 8);
+        
+        AddProceduralWindow(trimmedArray, _height, UBuilding);
+    }
+    
+    public void AddProceduralWindow(Vector3[] positionPoint, float _height, GameObject parent)
+    {
+        for (int i = 0; i < positionPoint.Length; i++)
+        {
+            // Create a new window GameObject
+            GameObject windowObject = new GameObject("Window");
+
+            // Add MeshFilter and MeshRenderer components to the window
+            MeshFilter windowMeshFilter = windowObject.AddComponent<MeshFilter>();
+            MeshRenderer windowMeshRenderer = windowObject.AddComponent<MeshRenderer>();
+
+            Mesh windowMesh = new Mesh();
+            windowMeshFilter.mesh = windowMesh;
+            windowMeshRenderer.material.color = UnityEngine.Color.blue; // Use the material you want for the window
+
+            float t1 = 0.25f;
+            float t3 = 0.75f;
+            
+            Vector3 firstNumber = positionPoint[i];
+            Vector3 secondNumber = positionPoint[(i + 1) % positionPoint.Length];
+            
+            Vector3 q1 = InterpolateVectors(firstNumber, secondNumber, t1);
+            Vector3 q3 = InterpolateVectors(firstNumber, secondNumber, t3);
+
+            Vector3[] windowVertices = new Vector3[]
+            {
+                // Front face
+                new Vector3(q1.x, _height * 0.25f, q1.z),
+                new Vector3(q1.x, _height * 0.75f, q1.z),
+                new Vector3(q3.x, _height * 0.75f, q3.z),
+                new Vector3(q3.x, _height * 0.25f, q3.z),
+            };
+            // Define the triangles for the window
+            int[] windowTriangles = new int[]
+            {
+                0, 1, 2,
+                0, 2, 3,
+            };
+            
+            windowMesh.vertices = windowVertices;
+            windowMesh.triangles = windowTriangles;
+            windowMesh.RecalculateNormals();
+
+            // Make the window a child of the UBuilding
+            windowObject.transform.parent = parent.transform;
+        }
+    }
+    
+    Vector3 InterpolateVectors(Vector3 start, Vector3 end, float t)
+    {
+        return (1 - t) * start + t * end;
     }
 
     public void CreateLBuilding(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
@@ -958,5 +1057,20 @@ public class LSystem : MonoBehaviour
         mesh.vertices = RCVertices;
         mesh.triangles = RCTriangles;
         mesh.RecalculateNormals();
+    }
+    
+    Vector3[] TrimArray(Vector3[] originalArray, int newSize)
+    {
+        if (newSize >= 0 && newSize <= originalArray.Length)
+        {
+            Vector3[] trimmedArray = new Vector3[newSize];
+            System.Array.Copy(originalArray, trimmedArray, newSize);
+            return trimmedArray;
+        }
+        else
+        {
+            Debug.LogWarning("Invalid newSize provided for trimming the array.");
+            return originalArray; // Return the original array if newSize is invalid
+        }
     }
 }
