@@ -38,7 +38,10 @@ public class LSystem : MonoBehaviour
     void Start()
     {
         currentPosition = Vector3.zero;
-        CreateUBuilding(6, 4, 4, 2, 2);
+        CreateCubeMesh(4,3,5);
+        // CreateUBuilding(5,3,5,2,1);
+        // CreateLBuilding(5,3,5,2,1);
+        // CreateRCBuilding(5,3,5,2,1);
     }
     public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth)
     {
@@ -193,56 +196,59 @@ public class LSystem : MonoBehaviour
         {
             // Front face
             new Vector3(currentPosition.x, _dasar, currentPosition.z),
-            new Vector3(currentPosition.x, _dasar, _width),
-            new Vector3(tempLenght, _dasar, _width),
             new Vector3(tempLenght, _dasar, currentPosition.z),
+            new Vector3(tempLenght, _dasar, _width),
+            new Vector3(currentPosition.x, _dasar, _width),
 
             // Back face
             new Vector3(currentPosition.x, _height, currentPosition.z),
-            new Vector3(currentPosition.x, _height, _width),
-            new Vector3(tempLenght, _height, _width),
             new Vector3(tempLenght, _height, currentPosition.z),
+            new Vector3(tempLenght, _height, _width),
+            new Vector3(currentPosition.x, _height, _width),
         };
 
         // Define triangles for the cube
         int[] cubeTriangles = new int[]
         {
             // Bottom face
-            0, 2, 1,
-            0, 3, 2,
+            0, 1, 2,
+            0, 2, 3,
 
             // Top face
-            4, 5, 6,
-            4, 6, 7,
+            4, 6, 5,
+            4, 7, 6,
 
             // Front face
-            2, 6, 5,
-            2, 5, 1,
+            2, 5, 6,
+            2, 1, 5,
             
             // Back face
-            0, 4, 7,
-            0, 7, 3,
+            0, 7, 4,
+            0, 3, 7,
             
             // Left face
-            0, 1, 5,
-            0, 5, 4,
+            0, 5, 1,
+            0, 4, 5,
             
             // Right face
-            3, 7, 6,
-            3, 6, 2,
+            3, 6, 7,
+            3, 2, 6,
         };
 
         Debug.Log(tempLenght);
         
-        AddDoorToCube(doorStart, _doorWidth, _height/2, cube);
+        Vector3[] trimmedArray = TrimArray(cubeVertices, 4);
+        AddProceduralDoor(cubeVertices[0], cubeVertices[1], _height, cube);
 
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
     }
     
-    void AddDoorToCube(float doorStart, float doorWidth, float height, GameObject parent)
+    void AddProceduralDoor(Vector3 doorStart, Vector3 doorEnd, float _height, GameObject parent)
     {
+        float doorHeight = 0;
+        float maxDoorWidth = 3f;
         // Create a new door GameObject
         GameObject doorObject = new GameObject("Door");
         doorObject.transform.SetParent(parent.transform);
@@ -255,14 +261,48 @@ public class LSystem : MonoBehaviour
         meshFilter.mesh = mesh;
         meshRenderer.material.color = UnityEngine.Color.black; // You can change this material as needed
 
-        // Define the vertices for the door
-        Vector3[] doorVertices = new Vector3[]
+        float t1 = 0.25f;
+        float t3 = 0.75f;
+        
+        Vector3 q1 = InterpolateVectors(doorStart, doorEnd, t1);
+        Vector3 q3 = InterpolateVectors(doorStart, doorEnd, t3);
+        float h3 = _height * 0.75f;
+
+        if (h3 < 5f)
         {
-            new Vector3(doorStart - doorWidth/2, currentPosition.y, currentPosition.z - 0.001f),
-            new Vector3(doorStart - doorWidth/2, currentPosition.y + height, currentPosition.z  - 0.001f),
-            new Vector3(doorStart + doorWidth/2, currentPosition.y + height, currentPosition.z  - 0.001f),
-            new Vector3(doorStart + doorWidth/2, currentPosition.y, currentPosition.z  - 0.001f),
-        };
+            doorHeight = h3;
+        }
+        else
+        {
+            doorHeight = 5;
+        }
+        
+        Debug.Log(Vector3.Distance(q3, q1) > maxDoorWidth);
+        Vector3 midpoint = (doorStart + doorEnd) / 2.0f;
+        Vector3[] doorVertices = new Vector3[4];
+        
+        if(Vector3.Distance(q3, q1) < maxDoorWidth)
+        {
+            doorVertices = new Vector3[]
+            {
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y, currentPosition.z - 0.001f),
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + doorHeight, currentPosition.z  - 0.001f),
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + doorHeight, currentPosition.z  - 0.001f),
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y, currentPosition.z  - 0.001f),
+            };
+        }
+        else
+        {
+            doorVertices = new Vector3[]
+            {
+                new Vector3(q1.x, currentPosition.y, currentPosition.z - 0.001f),
+                new Vector3(q1.x - (maxDoorWidth/2), currentPosition.y + doorHeight, currentPosition.z  - 0.001f),
+                new Vector3(q3.x + (maxDoorWidth/2), currentPosition.y + doorHeight, currentPosition.z  - 0.001f),
+                new Vector3(q3.x + (maxDoorWidth/2), currentPosition.y, currentPosition.z  - 0.001f),
+            };
+        }
+        
+        // Define the vertices for the door
 
         // Define triangles for the door
         int[] doorTriangles = new int[]
@@ -510,13 +550,14 @@ public class LSystem : MonoBehaviour
             Mesh windowMesh = new Mesh();
             windowMeshFilter.mesh = windowMesh;
             windowMeshRenderer.material.color = UnityEngine.Color.blue; // Use the material you want for the window
+            
 
             float t1 = 0.25f;
             float t3 = 0.75f;
             
             Vector3 firstNumber = positionPoint[i];
             Vector3 secondNumber = positionPoint[(i + 1) % positionPoint.Length];
-            
+
             Vector3 q1 = InterpolateVectors(firstNumber, secondNumber, t1);
             Vector3 q3 = InterpolateVectors(firstNumber, secondNumber, t3);
 
@@ -534,6 +575,36 @@ public class LSystem : MonoBehaviour
                 0, 1, 2,
                 0, 2, 3,
             };
+            
+            Vector3 normal = Vector3.Cross(windowVertices[1] - windowVertices[0], windowVertices[2] - windowVertices[0]).normalized;
+
+            // Assume the camera is looking along the positive z-axis
+            Vector3 viewDirection = Vector3.forward;
+
+            // Assume the camera's right direction is along the positive x-axis
+            Vector3 rightDirection = Vector3.right;
+
+            // Calculate the dot products
+            float dotProductRight = Vector3.Dot(normal, rightDirection);
+            float dotProductView = Vector3.Dot(normal, viewDirection);
+            
+            if (dotProductRight > 0)
+            {
+                windowObject.transform.position += new Vector3(0.001f, 0, 0);
+            }
+            else if (dotProductRight < 0)
+            {
+                windowObject.transform.position -= new Vector3(0.001f, 0, 0);
+            }
+
+            if (dotProductView > 0)
+            { 
+                windowObject.transform.position += new Vector3(0, 0, 0.001f);
+            }
+            else if (dotProductView < 0)
+            {
+                windowObject.transform.position -= new Vector3(0, 0, 0.001f);
+            }
             
             windowMesh.vertices = windowVertices;
             windowMesh.triangles = windowTriangles;
@@ -566,63 +637,55 @@ public class LSystem : MonoBehaviour
         Vector3[] LVertices = new Vector3[]
         {
             new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //1 
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //2 -
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //1
+            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //2 
             new Vector3(currentPosition.x + _innerLength, _dasar, _width), //3 -
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
+            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //4 -
+            new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //5 
 
             new Vector3(currentPosition.x, _height, currentPosition.z), //6
-            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //7
-            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //8 -
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //7
+            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //8
             new Vector3(currentPosition.x + _innerLength, _height, _width), //9 -
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //10 
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //11
+            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //10 -
+            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //11
         };
 
         // Define the triangles to form the cube's faces
         int[] LTriangles = new int[]
         {
-            /*6, 1, 0,
-            6, 0, 5,*/
-
-            /*4, 3, 6,
-            6, 3, 2,*/
-
-            /*8, 13, 7,
-            13, 12, 7,
-
-            10, 11, 13,
-            13, 9, 10,*/
+            1, 2, 0,
+            3, 4, 2,
+            4, 5 ,0,
+            4, 8, 2,
             
-            1, 0, 2,
-            3, 2, 4,
-            4, 0 ,5,
-            4, 2, 0,
-            
-            7, 8, 6,
-            9, 10 , 8,
-            10, 11, 6,
-            10, 6, 8,
+            7, 6, 8,
+            9, 8, 10,
+            10, 6, 11,
+            10, 8, 6,
 
-            0, 1, 7,
-            0, 7, 6,
+            0, 7, 1,
+            0, 6, 7,
 
-            1, 2, 8,
-            1, 8, 7,
+            1, 8, 2,
+            1, 7, 8,
 
-            2, 3, 8,
-            3, 9, 8,
+            2, 8, 3,
+            3, 8, 9,
 
-            3, 4, 9,
-            10, 9, 4,
+            3, 9, 4,
+            10, 4, 9,
 
-            4, 5, 11,
-            11, 10, 4,
+            4, 11, 5,
+            11, 4, 10,
 
-            6, 5, 0,
-            6, 11, 5,
+            6, 0, 5,
+            6, 5, 11,
         };
+        
+        Vector3[] trimmedArray = TrimArray(LVertices, 6);
+        
+        AddProceduralWindow(trimmedArray, _height, LBuilding);
 
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
@@ -695,6 +758,10 @@ public class LSystem : MonoBehaviour
         mesh.vertices = RCVertices;
         mesh.triangles = RCTriangles;
         mesh.RecalculateNormals();
+        
+        Vector3[] trimmedArray = TrimArray(RCVertices, 5);
+        
+        AddProceduralWindow(trimmedArray, _height, RCBuilding);
     }
 
     public void Uroof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
