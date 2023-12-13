@@ -39,10 +39,10 @@ public class LSystem : MonoBehaviour
     void Start()
     {
         currentPosition = Vector3.zero;
-        CreateCubeMesh(4,3,5);
-        CreateUBuilding(5,3,5,2,1);
-        CreateLBuilding(5,3,5,2,1);
-        CreateRCBuilding(5,3,5,2,1);
+        CreateCubeMesh(5,4,15);
+        CreateUBuilding(10,8,10,4,3);
+        CreateLBuilding(25,20,15,15,10);
+        CreateRCBuilding(25,20,15,15,10);
     }
     public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth)
     {
@@ -283,24 +283,25 @@ public class LSystem : MonoBehaviour
         Vector3 midpoint = (doorStart + doorEnd) / 2.0f;
         Vector3[] doorVertices = new Vector3[4];
         
-        if(Vector3.Distance(q3, q1) < maxDoorWidth)
+        if(Vector3.Distance(q3, q1) > maxDoorWidth)
         {
+            Debug.Log("this");
             doorVertices = new Vector3[]
             {
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y, currentPosition.z - 0.001f),
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + doorHeight, currentPosition.z  - 0.001f),
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + doorHeight, currentPosition.z  - 0.001f),
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y, currentPosition.z  - 0.001f),
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y, midpoint.z - 0.001f),
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + doorHeight, midpoint.z  - 0.001f),
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + doorHeight, midpoint.z  - 0.001f),
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y, midpoint.z  - 0.001f),
             };
         }
         else
         {
             doorVertices = new Vector3[]
             {
-                new Vector3(q1.x, currentPosition.y, currentPosition.z - 0.001f),
-                new Vector3(q1.x - (maxDoorWidth/2), currentPosition.y + doorHeight, currentPosition.z  - 0.001f),
-                new Vector3(q3.x + (maxDoorWidth/2), currentPosition.y + doorHeight, currentPosition.z  - 0.001f),
-                new Vector3(q3.x + (maxDoorWidth/2), currentPosition.y, currentPosition.z  - 0.001f),
+                new Vector3(q1.x, currentPosition.y, q1.z - 0.001f),
+                new Vector3(q1.x, currentPosition.y + doorHeight, q1.z  - 0.001f),
+                new Vector3(q3.x, currentPosition.y + doorHeight, q3.z  - 0.001f),
+                new Vector3(q3.x, currentPosition.y, q3.z  - 0.001f),
             };
         }
         
@@ -310,7 +311,7 @@ public class LSystem : MonoBehaviour
         int[] doorTriangles = new int[]
         {
             0, 1, 2,
-            0, 2, 3,
+            0, 2, 3
         };
 
         if (isStair)
@@ -328,22 +329,22 @@ public class LSystem : MonoBehaviour
             
             Vector3[] stairVertices = new Vector3[]
             {
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y, currentPosition.z - 6f), //0
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y, currentPosition.z  - 6f), //1
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 0.75f, currentPosition.z - 6f), //2
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 0.75f, currentPosition.z  - 6f), //3
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 0.75f, currentPosition.z - 4f), //4
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 0.75f, currentPosition.z  - 4f), //5
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 1.5f, currentPosition.z - 4f), //6
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 1.5f, currentPosition.z  - 4f), //7
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 1.5f, currentPosition.z - 2f), //8
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 1.5f, currentPosition.z  - 2f), //9
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 2.25f, currentPosition.z - 2f), //10
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 2.25f, currentPosition.z  - 2f), //11
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 2.25f, currentPosition.z - 0.001f), //12
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 2.25f, currentPosition.z  - 0.001f), //13
-                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y, currentPosition.z - 0.001f), //14
-                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y, currentPosition.z  - 0.001f), //15
+                new Vector3(doorVertices[0].x, currentPosition.y, doorVertices[0].z - 6f), //0
+                new Vector3(doorVertices[3].x, currentPosition.y, doorVertices[3].z  - 6f), //1
+                new Vector3(doorVertices[0].x, currentPosition.y + 0.75f, doorVertices[0].z - 6f), //2
+                new Vector3(doorVertices[3].x, currentPosition.y + 0.75f, doorVertices[3].z  - 6f), //3
+                new Vector3(doorVertices[0].x, currentPosition.y + 0.75f, doorVertices[0].z - 4f), //4
+                new Vector3(doorVertices[3].x, currentPosition.y + 0.75f, doorVertices[3].z  - 4f), //5
+                new Vector3(doorVertices[0].x, currentPosition.y + 1.5f, doorVertices[0].z - 4f), //6
+                new Vector3(doorVertices[3].x, currentPosition.y + 1.5f, doorVertices[3].z  - 4f), //7
+                new Vector3(doorVertices[0].x, currentPosition.y + 1.5f, doorVertices[0].z - 2f), //8
+                new Vector3(doorVertices[3].x, currentPosition.y + 1.5f, doorVertices[3].z  - 2f), //9
+                new Vector3(doorVertices[0].x, currentPosition.y + 2.25f, doorVertices[0].z - 2f), //10
+                new Vector3(doorVertices[3].x, currentPosition.y + 2.25f, doorVertices[3].z  - 2f), //11
+                new Vector3(doorVertices[0].x, currentPosition.y + 2.25f, doorVertices[0].z - 0.001f), //12
+                new Vector3(doorVertices[3].x, currentPosition.y + 2.25f, doorVertices[3].z  - 0.001f), //13
+                new Vector3(doorVertices[0].x, currentPosition.y, doorVertices[0].z - 0.001f), //14
+                new Vector3(doorVertices[3].x, currentPosition.y, doorVertices[3].z  - 0.001f), //15
             };
             
             int[] stairTriangles = new int[]
