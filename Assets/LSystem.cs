@@ -34,14 +34,15 @@ public class LSystem : MonoBehaviour
     public GameObject prefabs;
 
     public Material colorMaterial;
+    [SerializeField] private bool isStair = true;
 
     void Start()
     {
         currentPosition = Vector3.zero;
         CreateCubeMesh(4,3,5);
-        // CreateUBuilding(5,3,5,2,1);
-        // CreateLBuilding(5,3,5,2,1);
-        // CreateRCBuilding(5,3,5,2,1);
+        CreateUBuilding(5,3,5,2,1);
+        CreateLBuilding(5,3,5,2,1);
+        CreateRCBuilding(5,3,5,2,1);
     }
     public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth)
     {
@@ -239,6 +240,7 @@ public class LSystem : MonoBehaviour
         
         Vector3[] trimmedArray = TrimArray(cubeVertices, 4);
         AddProceduralDoor(cubeVertices[0], cubeVertices[1], _height, cube);
+        AddProceduralWindow(trimmedArray, _height, cube, cubeVertices[0], cubeVertices[1]);
 
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
@@ -311,10 +313,83 @@ public class LSystem : MonoBehaviour
             0, 2, 3,
         };
 
+        if (isStair)
+        {
+            GameObject stairObject = new GameObject("Stair");
+            stairObject.transform.SetParent(doorObject.transform);
+
+            // Add MeshFilter and MeshRenderer components
+            MeshFilter meshFilterStair = stairObject.AddComponent<MeshFilter>();
+            MeshRenderer meshRendererStair = stairObject.AddComponent<MeshRenderer>();
+
+            Mesh meshStair = new Mesh();
+            meshFilterStair.mesh = meshStair;
+            meshRendererStair.material.color = UnityEngine.Color.blue;
+            
+            Vector3[] stairVertices = new Vector3[]
+            {
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y, currentPosition.z - 6f), //0
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y, currentPosition.z  - 6f), //1
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 0.75f, currentPosition.z - 6f), //2
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 0.75f, currentPosition.z  - 6f), //3
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 0.75f, currentPosition.z - 4f), //4
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 0.75f, currentPosition.z  - 4f), //5
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 1.5f, currentPosition.z - 4f), //6
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 1.5f, currentPosition.z  - 4f), //7
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 1.5f, currentPosition.z - 2f), //8
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 1.5f, currentPosition.z  - 2f), //9
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 2.25f, currentPosition.z - 2f), //10
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 2.25f, currentPosition.z  - 2f), //11
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y + 2.25f, currentPosition.z - 0.001f), //12
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y + 2.25f, currentPosition.z  - 0.001f), //13
+                new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y, currentPosition.z - 0.001f), //14
+                new Vector3(midpoint.x + (maxDoorWidth/2), currentPosition.y, currentPosition.z  - 0.001f), //15
+            };
+            
+            int[] stairTriangles = new int[]
+            {
+                0, 3, 1,
+                0, 2, 3,
+                
+                2, 5, 3,
+                2, 4, 5,
+                
+                4, 7, 5,
+                4, 6, 7,
+                
+                6, 9, 7,
+                6, 8, 9,
+                
+                8, 11, 9,
+                8, 10, 11,
+                
+                10, 13, 11,
+                10, 12, 13,
+                
+                0, 14, 2,
+                2, 14, 4,
+                4, 14, 6,
+                6, 14, 8,
+                8, 14, 10,
+                10, 14, 12,
+                
+                1, 3, 15,
+                3, 5, 15,
+                5, 7, 15, 
+                7, 9, 15,
+                9, 11, 15,
+                11, 13, 15,
+            };
+            
+            meshStair.vertices = stairVertices;
+            meshStair.triangles = stairTriangles;
+            mesh.RecalculateNormals();
+            Debug.Log(stairVertices[13]);
+        }
+
         mesh.vertices = doorVertices;
         mesh.triangles = doorTriangles;
         mesh.RecalculateNormals();
-        meshRenderer.material.renderQueue = 3000; 
     }
     
     public void CreatePyramid(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
@@ -533,85 +608,91 @@ public class LSystem : MonoBehaviour
         
         Vector3[] trimmedArray = TrimArray(uVertices, 8);
         
-        AddProceduralWindow(trimmedArray, _height, UBuilding);
+        AddProceduralDoor(uVertices[2], uVertices[3], _height, UBuilding);
+        AddProceduralWindow(trimmedArray, _height, UBuilding, uVertices[2], uVertices[3]);
     }
     
-    public void AddProceduralWindow(Vector3[] positionPoint, float _height, GameObject parent)
+    public void AddProceduralWindow(Vector3[] positionPoint, float _height, GameObject parent, Vector3 doorStart = default, Vector3 doorEnd = default)
     {
         for (int i = 0; i < positionPoint.Length; i++)
         {
-            // Create a new window GameObject
-            GameObject windowObject = new GameObject("Window");
-
-            // Add MeshFilter and MeshRenderer components to the window
-            MeshFilter windowMeshFilter = windowObject.AddComponent<MeshFilter>();
-            MeshRenderer windowMeshRenderer = windowObject.AddComponent<MeshRenderer>();
-
-            Mesh windowMesh = new Mesh();
-            windowMeshFilter.mesh = windowMesh;
-            windowMeshRenderer.material.color = UnityEngine.Color.blue; // Use the material you want for the window
-            
-
-            float t1 = 0.25f;
-            float t3 = 0.75f;
-            
             Vector3 firstNumber = positionPoint[i];
             Vector3 secondNumber = positionPoint[(i + 1) % positionPoint.Length];
 
-            Vector3 q1 = InterpolateVectors(firstNumber, secondNumber, t1);
-            Vector3 q3 = InterpolateVectors(firstNumber, secondNumber, t3);
-
-            Vector3[] windowVertices = new Vector3[]
+            if (doorStart != firstNumber && doorEnd != secondNumber)
             {
-                // Front face
-                new Vector3(q1.x, _height * 0.25f, q1.z),
-                new Vector3(q1.x, _height * 0.75f, q1.z),
-                new Vector3(q3.x, _height * 0.75f, q3.z),
-                new Vector3(q3.x, _height * 0.25f, q3.z),
-            };
-            // Define the triangles for the window
-            int[] windowTriangles = new int[]
-            {
-                0, 1, 2,
-                0, 2, 3,
-            };
-            
-            Vector3 normal = Vector3.Cross(windowVertices[1] - windowVertices[0], windowVertices[2] - windowVertices[0]).normalized;
+                // Create a new window GameObject
+                GameObject windowObject = new GameObject("Window");
 
-            // Assume the camera is looking along the positive z-axis
-            Vector3 viewDirection = Vector3.forward;
+                // Add MeshFilter and MeshRenderer components to the window
+                MeshFilter windowMeshFilter = windowObject.AddComponent<MeshFilter>();
+                MeshRenderer windowMeshRenderer = windowObject.AddComponent<MeshRenderer>();
 
-            // Assume the camera's right direction is along the positive x-axis
-            Vector3 rightDirection = Vector3.right;
+                Mesh windowMesh = new Mesh();
+                windowMeshFilter.mesh = windowMesh;
+                windowMeshRenderer.material.color = UnityEngine.Color.blue; // Use the material you want for the window
 
-            // Calculate the dot products
-            float dotProductRight = Vector3.Dot(normal, rightDirection);
-            float dotProductView = Vector3.Dot(normal, viewDirection);
-            
-            if (dotProductRight > 0)
-            {
-                windowObject.transform.position += new Vector3(0.001f, 0, 0);
+
+                float t1 = 0.25f;
+                float t3 = 0.75f;
+
+
+                Vector3 q1 = InterpolateVectors(firstNumber, secondNumber, t1);
+                Vector3 q3 = InterpolateVectors(firstNumber, secondNumber, t3);
+
+                Vector3[] windowVertices = new Vector3[]
+                {
+                    // Front face
+                    new Vector3(q1.x, _height * 0.25f, q1.z),
+                    new Vector3(q1.x, _height * 0.75f, q1.z),
+                    new Vector3(q3.x, _height * 0.75f, q3.z),
+                    new Vector3(q3.x, _height * 0.25f, q3.z),
+                };
+                // Define the triangles for the window
+                int[] windowTriangles = new int[]
+                {
+                    0, 1, 2,
+                    0, 2, 3,
+                };
+
+                Vector3 normal = Vector3
+                    .Cross(windowVertices[1] - windowVertices[0], windowVertices[2] - windowVertices[0]).normalized;
+
+                // Assume the camera is looking along the positive z-axis
+                Vector3 viewDirection = Vector3.forward;
+
+                // Assume the camera's right direction is along the positive x-axis
+                Vector3 rightDirection = Vector3.right;
+
+                // Calculate the dot products
+                float dotProductRight = Vector3.Dot(normal, rightDirection);
+                float dotProductView = Vector3.Dot(normal, viewDirection);
+
+                if (dotProductRight > 0)
+                {
+                    windowObject.transform.position += new Vector3(0.001f, 0, 0);
+                }
+                else if (dotProductRight < 0)
+                {
+                    windowObject.transform.position -= new Vector3(0.001f, 0, 0);
+                }
+
+                if (dotProductView > 0)
+                {
+                    windowObject.transform.position += new Vector3(0, 0, 0.001f);
+                }
+                else if (dotProductView < 0)
+                {
+                    windowObject.transform.position -= new Vector3(0, 0, 0.001f);
+                }
+
+                windowMesh.vertices = windowVertices;
+                windowMesh.triangles = windowTriangles;
+                windowMesh.RecalculateNormals();
+
+                // Make the window a child of the UBuilding
+                windowObject.transform.parent = parent.transform;
             }
-            else if (dotProductRight < 0)
-            {
-                windowObject.transform.position -= new Vector3(0.001f, 0, 0);
-            }
-
-            if (dotProductView > 0)
-            { 
-                windowObject.transform.position += new Vector3(0, 0, 0.001f);
-            }
-            else if (dotProductView < 0)
-            {
-                windowObject.transform.position -= new Vector3(0, 0, 0.001f);
-            }
-            
-            windowMesh.vertices = windowVertices;
-            windowMesh.triangles = windowTriangles;
-            windowMesh.RecalculateNormals();
-
-            // Make the window a child of the UBuilding
-            windowObject.transform.parent = parent.transform;
         }
     }
     
@@ -685,7 +766,8 @@ public class LSystem : MonoBehaviour
         
         Vector3[] trimmedArray = TrimArray(LVertices, 6);
         
-        AddProceduralWindow(trimmedArray, _height, LBuilding);
+        AddProceduralWindow(trimmedArray, _height, LBuilding, LVertices[0], LVertices[1]);
+        AddProceduralDoor(LVertices[0], LVertices[1], _height, LBuilding);
 
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
@@ -761,7 +843,8 @@ public class LSystem : MonoBehaviour
         
         Vector3[] trimmedArray = TrimArray(RCVertices, 5);
         
-        AddProceduralWindow(trimmedArray, _height, RCBuilding);
+        AddProceduralWindow(trimmedArray, _height, RCBuilding, RCVertices[0], RCVertices[1]);
+        AddProceduralDoor(RCVertices[0], RCVertices[1], _height, RCBuilding);
     }
 
     public void Uroof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
