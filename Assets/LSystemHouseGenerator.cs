@@ -3,19 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-using UnityEngine;
-
 public class LSystemHouseGenerator : MonoBehaviour
 {
-    private string axiom = "F";
     private string currentString;
-    private int iterations = 3; // Adjust the number of iterations
-
-    private float wallLength = 5f;
-    private float doorWidth = 1f;
-    private float windowWidth = 1f;
-    private float windowHeight = 1f;
-    
     
     private Vector3 currentPosition;
 

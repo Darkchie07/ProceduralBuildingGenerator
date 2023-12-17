@@ -15,9 +15,8 @@ public class LSystem : MonoBehaviour
     public float length = 1.0f;
 
     public string axiom = "FTFTUF";
-    private string currentString = "";
-    private string nextString = "";
     private Vector3 currentPosition;
+    public List<GameObject> lastObject = new List<GameObject>();
 
     public List<char> initialShape;
     public List<int> floorNum;
@@ -38,11 +37,10 @@ public class LSystem : MonoBehaviour
     public GameObject prefabs;
 
     public Material colorMaterial;
-    [SerializeField] private bool isStair = true;
 
     void Start()
     {
-        currentPosition = Vector3.zero;
+        currentPosition = new Vector3(1, 0, 1);
         GenerateLSystem();
     }
     public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth
@@ -64,7 +62,6 @@ public class LSystem : MonoBehaviour
 
     void GenerateLSystem()
     {
-        currentPosition = transform.position;
         int indexPos = 0;
         int indexSize = 0;
         for (int i = 0; i < result.Length; i++)
@@ -78,6 +75,7 @@ public class LSystem : MonoBehaviour
             int counterRight = 0;
             if (result[i][0] == 'C')
             {
+                lastObject.Clear();
                 if (result[i].Length > 2)
                 {
                     if (result[i][2] == 'W')
@@ -112,6 +110,7 @@ public class LSystem : MonoBehaviour
                         if (j == '-')
                         {
                             counterLeft += 1;
+                            RotateObject(lastObject, counterLeft * -90);
                         }
                     }
                 }else if (result[i].Contains('+'))
@@ -121,6 +120,7 @@ public class LSystem : MonoBehaviour
                         if (j == '+')
                         {
                             counterRight += 1;
+                            RotateObject(lastObject, counterLeft * 90);
                         }
                     }
                 }
@@ -136,6 +136,7 @@ public class LSystem : MonoBehaviour
                 indexSize += 1;
             }else if (result[i][0] == 'U')
             {
+                lastObject.Clear();
                 if (result[i].Length > 2)
                 {
                     if (result[i][2] == 'W')
@@ -168,25 +169,6 @@ public class LSystem : MonoBehaviour
                 tempheight += ParamHeight[indexSize];
                 tempDasar += ParamHeight[indexSize];
 
-                if (result[i].Contains('-'))
-                {
-                    for (int j = 0; j < result[i].Length; j++)
-                    {
-                        if (j == '-')
-                        {
-                            counterLeft += 1;
-                        }
-                    }
-                }else if (result[i].Contains('+'))
-                {
-                    for (int j = 0; j < result[i].Length; j++)
-                    {
-                        if (j == '+')
-                        {
-                            counterRight += 1;
-                        }
-                    }
-                }
                 
                 if (result[i][1] == 'X')
                 {
@@ -196,9 +178,32 @@ public class LSystem : MonoBehaviour
                     Uroof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
                 }
 
+                if (result[i].Contains('-'))
+                {
+                    Debug.Log("Yes");
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (result[i][j] == '-')
+                        {
+                            counterLeft += 1;
+                        }
+                    }
+                    RotateObject(lastObject, counterLeft * -90);
+                }else if (result[i].Contains('+'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (result[i][j] == '+')
+                        {
+                            counterRight += 1;
+                        }
+                    }
+                    RotateObject(lastObject, counterRight * 90);
+                }
                 indexSize += 1;
             }else if (result[i][0] == 'L')
             {
+                lastObject.Clear();
                 if (result[i].Length > 2)
                 {
                     if (result[i][2] == 'W')
@@ -238,6 +243,7 @@ public class LSystem : MonoBehaviour
                         if (j == '-')
                         {
                             counterLeft += 1;
+                            RotateObject(lastObject, counterLeft * -90);
                         }
                     }
                 }else if (result[i].Contains('+'))
@@ -247,6 +253,7 @@ public class LSystem : MonoBehaviour
                         if (j == '+')
                         {
                             counterRight += 1;
+                            RotateObject(lastObject, counterLeft * 90);
                         }
                     }
                 }
@@ -262,6 +269,7 @@ public class LSystem : MonoBehaviour
                 indexSize += 1;
             }else if (result[i][0] == 'R')
             {
+                lastObject.Clear();
                 if (result[i].Length > 2)
                 {
                     if (result[i][2] == 'W')
@@ -301,6 +309,7 @@ public class LSystem : MonoBehaviour
                         if (j == '-')
                         {
                             counterLeft += 1;
+                            RotateObject(lastObject, counterLeft * -90);
                         }
                     }
                 }else if (result[i].Contains('+'))
@@ -310,10 +319,11 @@ public class LSystem : MonoBehaviour
                         if (j == '+')
                         {
                             counterRight += 1;
+                            RotateObject(lastObject, counterLeft * 90);
                         }
                     }
                 }
-
+                
                 if (result[i][1] == 'X')
                 {
                     RCRoof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
@@ -396,14 +406,14 @@ public class LSystem : MonoBehaviour
             // Front face
             new Vector3(currentPosition.x, _dasar, currentPosition.z),
             new Vector3(tempLenght, _dasar, currentPosition.z),
-            new Vector3(tempLenght, _dasar, _width),
-            new Vector3(currentPosition.x, _dasar, _width),
+            new Vector3(tempLenght, _dasar, _width + currentPosition.z),
+            new Vector3(currentPosition.x, _dasar, _width + currentPosition.z),
 
             // Back face
             new Vector3(currentPosition.x, _height, currentPosition.z),
             new Vector3(tempLenght, _height, currentPosition.z),
-            new Vector3(tempLenght, _height, _width),
-            new Vector3(currentPosition.x, _height, _width),
+            new Vector3(tempLenght, _height, _width + currentPosition.z),
+            new Vector3(currentPosition.x, _height, _width + currentPosition.z),
         };
 
         // Define triangles for the cube
@@ -451,6 +461,7 @@ public class LSystem : MonoBehaviour
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
+        lastObject.Add(cube);
     }
     
     void AddProceduralDoor(Vector3 doorStart, Vector3 doorEnd, float _height, GameObject parent, bool stair)
@@ -517,7 +528,7 @@ public class LSystem : MonoBehaviour
             0, 2, 3
         };
 
-        if (isStair)
+        if (stair)
         {
             GameObject stairObject = new GameObject("Stair");
             stairObject.transform.SetParent(doorObject.transform);
@@ -529,62 +540,62 @@ public class LSystem : MonoBehaviour
             Mesh meshStair = new Mesh();
             meshFilterStair.mesh = meshStair;
             meshRendererStair.material.color = UnityEngine.Color.blue;
-            
+
             Vector3[] stairVertices = new Vector3[]
             {
                 new Vector3(doorVertices[0].x, currentPosition.y, doorVertices[0].z - 6f), //0
-                new Vector3(doorVertices[3].x, currentPosition.y, doorVertices[3].z  - 6f), //1
+                new Vector3(doorVertices[3].x, currentPosition.y, doorVertices[3].z - 6f), //1
                 new Vector3(doorVertices[0].x, currentPosition.y + 0.75f, doorVertices[0].z - 6f), //2
-                new Vector3(doorVertices[3].x, currentPosition.y + 0.75f, doorVertices[3].z  - 6f), //3
+                new Vector3(doorVertices[3].x, currentPosition.y + 0.75f, doorVertices[3].z - 6f), //3
                 new Vector3(doorVertices[0].x, currentPosition.y + 0.75f, doorVertices[0].z - 4f), //4
-                new Vector3(doorVertices[3].x, currentPosition.y + 0.75f, doorVertices[3].z  - 4f), //5
+                new Vector3(doorVertices[3].x, currentPosition.y + 0.75f, doorVertices[3].z - 4f), //5
                 new Vector3(doorVertices[0].x, currentPosition.y + 1.5f, doorVertices[0].z - 4f), //6
-                new Vector3(doorVertices[3].x, currentPosition.y + 1.5f, doorVertices[3].z  - 4f), //7
+                new Vector3(doorVertices[3].x, currentPosition.y + 1.5f, doorVertices[3].z - 4f), //7
                 new Vector3(doorVertices[0].x, currentPosition.y + 1.5f, doorVertices[0].z - 2f), //8
-                new Vector3(doorVertices[3].x, currentPosition.y + 1.5f, doorVertices[3].z  - 2f), //9
+                new Vector3(doorVertices[3].x, currentPosition.y + 1.5f, doorVertices[3].z - 2f), //9
                 new Vector3(doorVertices[0].x, currentPosition.y + 2.25f, doorVertices[0].z - 2f), //10
-                new Vector3(doorVertices[3].x, currentPosition.y + 2.25f, doorVertices[3].z  - 2f), //11
+                new Vector3(doorVertices[3].x, currentPosition.y + 2.25f, doorVertices[3].z - 2f), //11
                 new Vector3(doorVertices[0].x, currentPosition.y + 2.25f, doorVertices[0].z - 0.001f), //12
-                new Vector3(doorVertices[3].x, currentPosition.y + 2.25f, doorVertices[3].z  - 0.001f), //13
+                new Vector3(doorVertices[3].x, currentPosition.y + 2.25f, doorVertices[3].z - 0.001f), //13
                 new Vector3(doorVertices[0].x, currentPosition.y, doorVertices[0].z - 0.001f), //14
-                new Vector3(doorVertices[3].x, currentPosition.y, doorVertices[3].z  - 0.001f), //15
+                new Vector3(doorVertices[3].x, currentPosition.y, doorVertices[3].z - 0.001f), //15
             };
-            
+
             int[] stairTriangles = new int[]
             {
                 0, 3, 1,
                 0, 2, 3,
-                
+
                 2, 5, 3,
                 2, 4, 5,
-                
+
                 4, 7, 5,
                 4, 6, 7,
-                
+
                 6, 9, 7,
                 6, 8, 9,
-                
+
                 8, 11, 9,
                 8, 10, 11,
-                
+
                 10, 13, 11,
                 10, 12, 13,
-                
+
                 0, 14, 2,
                 2, 14, 4,
                 4, 14, 6,
                 6, 14, 8,
                 8, 14, 10,
                 10, 14, 12,
-                
+
                 1, 3, 15,
                 3, 5, 15,
-                5, 7, 15, 
+                5, 7, 15,
                 7, 9, 15,
                 9, 11, 15,
                 11, 13, 15,
             };
-            
+
             meshStair.vertices = stairVertices;
             meshStair.triangles = stairTriangles;
             mesh.RecalculateNormals();
@@ -621,8 +632,8 @@ public class LSystem : MonoBehaviour
         {
             // Front face
             new Vector3(currentPosition.x, _dasar, currentPosition.z),
-            new Vector3(currentPosition.x, _dasar, _width),
-            new Vector3(tempLenght, _dasar, _width),
+            new Vector3(currentPosition.x, _dasar, _width + currentPosition.z),
+            new Vector3(tempLenght, _dasar, _width + currentPosition.z),
             new Vector3(tempLenght, _dasar, currentPosition.z),
 
             // Back face
@@ -649,12 +660,11 @@ public class LSystem : MonoBehaviour
             3, 0, 4,
         };
 
-        Debug.Log(tempLenght);
-
         mesh.vertices = pyramidVertices;
         mesh.triangles = pyramidTriangles;
         // Optionally, calculate normals
         mesh.RecalculateNormals();
+        lastObject.Add(pyramid);
     }
     
     public void CRoof2(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
@@ -712,12 +722,11 @@ public class LSystem : MonoBehaviour
             3, 0, 4,
         };
 
-        Debug.Log(tempLenght);
-
         mesh.vertices = pyramidVertices;
         mesh.triangles = pyramidTriangles;
         // Optionally, calculate normals
         mesh.RecalculateNormals();
+        lastObject.Add(pyramid);
     }
 
     public void CreateUBuilding(bool door, bool stair, bool window, float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
@@ -823,6 +832,7 @@ public class LSystem : MonoBehaviour
         {
             AddProceduralWindow(trimmedArray, _height, UBuilding);
         }
+        lastObject.Add(UBuilding);
     }
     
     public void AddProceduralWindow(Vector3[] positionPoint, float _height, GameObject parent, Vector3 doorStart = default, Vector3 doorEnd = default)
@@ -932,14 +942,14 @@ public class LSystem : MonoBehaviour
             new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //1
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //2 
-            new Vector3(currentPosition.x + _innerLength, _dasar, _width), //3 -
+            new Vector3(currentPosition.x + _innerLength, _dasar, _width + currentPosition.z), //3 -
             new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //4 -
             new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //5 
 
             new Vector3(currentPosition.x, _height, currentPosition.z), //6
             new Vector3(currentPosition.x + _length, _height, currentPosition.z), //7
             new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //8
-            new Vector3(currentPosition.x + _innerLength, _height, _width), //9 -
+            new Vector3(currentPosition.x + _innerLength, _height, _width + currentPosition.z), //9 -
             new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //10 -
             new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //11
         };
@@ -994,6 +1004,7 @@ public class LSystem : MonoBehaviour
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
+        lastObject.Add(LBuilding);
     }
 
     public void CreateRCBuilding(bool door, bool stair, bool window, float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
@@ -1077,6 +1088,7 @@ public class LSystem : MonoBehaviour
         {
             AddProceduralWindow(trimmedArray, _height, RCBuilding);
         }
+        lastObject.Add(RCBuilding);
     }
 
     public void Uroof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
@@ -1152,6 +1164,7 @@ public class LSystem : MonoBehaviour
         mesh.vertices = uRoof1Vertices;
         mesh.triangles = uRoof1Triangles;
         mesh.RecalculateNormals();
+        lastObject.Add(roof);
     }
     
     public void Uroof2(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
@@ -1221,15 +1234,16 @@ public class LSystem : MonoBehaviour
         mesh.vertices = uRoof1Vertices;
         mesh.triangles = uRoof1Triangles;
         mesh.RecalculateNormals();
+        lastObject.Add(roof);
     }
     
     public void LRoof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
-        GameObject LBuilding = new GameObject("LRoof");
+        GameObject roof = new GameObject("LRoof");
 
         // Add MeshFilter and MeshRenderer components
-        MeshFilter meshFilter = LBuilding.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = LBuilding.AddComponent<MeshRenderer>();
+        MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = roof.AddComponent<MeshRenderer>();
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
@@ -1243,7 +1257,7 @@ public class LSystem : MonoBehaviour
             new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
             new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //1 
             new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //2 -
-            new Vector3(currentPosition.x + _innerLength, _dasar, _width), //3 -
+            new Vector3(currentPosition.x + _innerLength, _dasar, _width + currentPosition.z), //3 -
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
 
@@ -1280,15 +1294,16 @@ public class LSystem : MonoBehaviour
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
+        lastObject.Add(roof);
     }
     
     public void LRoof2(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
-        GameObject LBuilding = new GameObject("LRoof");
+        GameObject roof = new GameObject("LRoof");
 
         // Add MeshFilter and MeshRenderer components
-        MeshFilter meshFilter = LBuilding.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = LBuilding.AddComponent<MeshRenderer>();
+        MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = roof.AddComponent<MeshRenderer>();
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
@@ -1302,7 +1317,7 @@ public class LSystem : MonoBehaviour
             new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
             new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //1 
             new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //2 -
-            new Vector3(currentPosition.x + _innerLength, _dasar, _width), //3 -
+            new Vector3(currentPosition.x + _innerLength, _dasar,  + currentPosition.z), //3 -
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
             new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
 
@@ -1333,15 +1348,16 @@ public class LSystem : MonoBehaviour
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
+        lastObject.Add(roof);
     }
     
     public void RCRoof1(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
-        GameObject RCBuilding = new GameObject("RCBuilding");
+        GameObject roof = new GameObject("RCBuilding");
 
         // Add MeshFilter and MeshRenderer components
-        MeshFilter meshFilter = RCBuilding.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = RCBuilding.AddComponent<MeshRenderer>();
+        MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = roof.AddComponent<MeshRenderer>();
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
@@ -1391,15 +1407,16 @@ public class LSystem : MonoBehaviour
         mesh.vertices = RCVertices;
         mesh.triangles = RCTriangles;
         mesh.RecalculateNormals();
+        lastObject.Add(roof);
     }
     
     public void RCRoof2(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
-        GameObject RCBuilding = new GameObject("RCBuilding");
+        GameObject roof = new GameObject("RCBuilding");
 
         // Add MeshFilter and MeshRenderer components
-        MeshFilter meshFilter = RCBuilding.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = RCBuilding.AddComponent<MeshRenderer>();
+        MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = roof.AddComponent<MeshRenderer>();
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
@@ -1439,6 +1456,7 @@ public class LSystem : MonoBehaviour
         mesh.vertices = RCVertices;
         mesh.triangles = RCTriangles;
         mesh.RecalculateNormals();
+        lastObject.Add(roof);
     }
     
     Vector3[] TrimArray(Vector3[] originalArray, int newSize)
@@ -1453,6 +1471,15 @@ public class LSystem : MonoBehaviour
         {
             Debug.LogWarning("Invalid newSize provided for trimming the array.");
             return originalArray; // Return the original array if newSize is invalid
+        }
+    }
+
+    public void RotateObject(List<GameObject> rotateObject, float angle)
+    {
+        for (int i = 0; i < rotateObject.Count; i++)
+        {
+            Vector3 rotation = new Vector3(0, angle, 0);
+            rotateObject[i].transform.localEulerAngles = rotation;
         }
     }
 }
