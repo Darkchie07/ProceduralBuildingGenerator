@@ -2500,6 +2500,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1035911873}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1163538701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3561,7 +3573,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1844966921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3665,7 +3677,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   iterations: 1
   length: 1
-  axiom: A10XB3YB5XC2XC4Y
+  axiom: YB5XC2XC4YC2XC4Y
   initialShape: 
   floorNum: 
   roofType: 
@@ -3674,8 +3686,12 @@ MonoBehaviour:
   ParamHeight: []
   ParamInnerLength: []
   ParamInnerWidth: []
+  ParamXPosition: []
+  ParamYPosition: []
+  ParamZPosition: []
   prefabs: {fileID: 5971486143198458541, guid: 2d1684dac503c4942acfd43bf6bf3dd1, type: 3}
   colorMaterial: {fileID: 2100000, guid: 30ec90287deacee44818d47cad882ea8, type: 2}
+  isStair: 1
 --- !u!1 &1903337158
 GameObject:
   m_ObjectHideFlags: 0
@@ -4021,6 +4037,7 @@ MonoBehaviour:
   parents: {fileID: 645817190}
   inputBuild1: {fileID: 4892792696885472463, guid: 9b89cb48c23eeae42a4a7186df22528f, type: 3}
   inputBuild2: {fileID: 6780741349772024940, guid: 16f104dc07e43744bb7ef25357cccc81, type: 3}
+  inputPosition: {fileID: 6780741349772024940, guid: e3e16a02e46182240b9ad2f3962ee7ab, type: 3}
   initialShape: 
   floorNum: 
   roofType: 
@@ -4029,6 +4046,9 @@ MonoBehaviour:
   _paramHeight: []
   _paramInnerLength: []
   _paramInnerWidth: []
+  _paramXPosition: []
+  _paramYPosition: []
+  _paramZPosition: []
   errorPanel: {fileID: 1814804993}
   inputPanel: {fileID: 1506697405}
 --- !u!1 &2135633302

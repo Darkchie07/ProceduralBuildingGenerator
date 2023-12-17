@@ -9,6 +9,9 @@ TagManager:
   - Height
   - innerLength
   - innerWidth
+  - yposition
+  - zposition
+  - xposition
   layers:
   - Default
   - TransparentFX

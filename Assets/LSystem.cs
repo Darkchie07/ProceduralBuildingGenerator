@@ -27,6 +27,10 @@ public class LSystem : MonoBehaviour
     public List<float> ParamHeight;
     public List<float> ParamInnerLength;
     public List<float> ParamInnerWidth;
+    public List<float> ParamXPosition;
+    public List<float> ParamYPosition;
+    public List<float> ParamZPosition;
+    private string[] result;
     
     List<char> validShape = new List<char> { 'A', 'B', 'C', 'D' };
     List<char> validRoof = new List<char> { 'X', 'Y' };
@@ -39,12 +43,10 @@ public class LSystem : MonoBehaviour
     void Start()
     {
         currentPosition = Vector3.zero;
-        CreateCubeMesh(5,4,15);
-        CreateUBuilding(10,8,10,4,3);
-        CreateLBuilding(25,20,15,15,10);
-        CreateRCBuilding(25,20,15,15,10);
+        GenerateLSystem();
     }
-    public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth)
+    public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth
+    , List<float> _paramXPosition, List<float> _paramYPosition, List<float> _paramZPosition, string[] _result)
     {
         initialShape = _initialShape;
         floorNum = _floorNum;
@@ -54,80 +56,277 @@ public class LSystem : MonoBehaviour
         ParamHeight = _paramHeight;
         ParamInnerLength = _paramInnerLength;
         ParamInnerWidth = _paramInnerWidth;
+        ParamXPosition = _paramXPosition;
+        ParamYPosition = _paramYPosition;
+        ParamZPosition = _paramZPosition;
+        result = _result;
     }
 
     void GenerateLSystem()
     {
         currentPosition = transform.position;
-        for (int i = 0; i < initialShape.Count; i++)
+        int indexPos = 0;
+        int indexSize = 0;
+        for (int i = 0; i < result.Length; i++)
         {
-            float tempheight = ParamHeight[i];
+            float tempheight = ParamHeight[indexSize];
             float tempDasar = 0;
-            if (initialShape[i] == 'A')
+            bool door = false;
+            bool window = false;
+            bool stair = false;
+            int counterLeft = 0;
+            int counterRight = 0;
+            if (result[i][0] == 'C')
             {
-                for (int j = 0; j < floorNum[i]; j++)
+                if (result[i].Length > 2)
                 {
-                    CreateCubeMesh(ParamLength[i], ParamWidth[i], tempheight, tempDasar);
-                    tempheight += ParamHeight[i];
-                    tempDasar += ParamHeight[i];
+                    if (result[i][2] == 'W')
+                    {
+                        window = true;
+                    }else if (result[i][2] == 'D')
+                    {
+                        door = true;
+                    }else if (result[i][2] == 'A')
+                    {
+                        door = true;
+                        window = true;
+                        stair = true;
+                    } else if (result[i][2] == 'S')
+                    {
+                        door = true;
+                        stair = true;
+                    } else if (result[i][2] == 'B')
+                    {
+                        door = true;
+                        window = true;
+                    }
+                }
+                CreateCubeMesh(door, stair, window, ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar);
+                tempheight += ParamHeight[indexSize];
+                tempDasar += ParamHeight[indexSize];
+
+                if (result[i].Contains('-'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (j == '-')
+                        {
+                            counterLeft += 1;
+                        }
+                    }
+                }else if (result[i].Contains('+'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (j == '+')
+                        {
+                            counterRight += 1;
+                        }
+                    }
                 }
 
-                if (roofType[i] == 'X')
+                if (result[i][1] == 'X')
                 {
-                    CreatePyramid(ParamLength[i], ParamWidth[i], tempheight, tempDasar);
-                }
-                UpdatePosition(new Vector3(ParamLength[i], 0, currentPosition.z));
-            }else if (initialShape[i] == 'B')
-            {
-                for (int j = 0; j < floorNum[i]; j++)
+                    CreatePyramid(ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar);
+                }else if (result[i][1] == 'Y')
                 {
-                    CreateUBuilding(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
-                    tempheight += ParamHeight[i];
-                    tempDasar += ParamHeight[i];
+                    CreatePyramid(ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar);
                 }
 
-                if (roofType[i] == 'X')
-                {
-                    Uroof1(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
-                }else if(roofType[i] == 'Y')
-                {
-                    Uroof2(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
-                }
-                UpdatePosition(new Vector3(ParamLength[i], 0, currentPosition.z));
-            }else if (initialShape[i] == 'C')
+                indexSize += 1;
+            }else if (result[i][0] == 'U')
             {
-                for (int j = 0; j < floorNum[i]; j++)
+                if (result[i].Length > 2)
                 {
-                    CreateLBuilding(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
-                    tempheight += ParamHeight[i];
-                    tempDasar += ParamHeight[i];
+                    if (result[i][2] == 'W')
+                    {
+                        window = true;
+                    }
+                    else if (result[i][2] == 'D')
+                    {
+                        door = true;
+                    }
+                    else if (result[i][2] == 'A')
+                    {
+                        door = true;
+                        window = true;
+                        stair = true;
+                    }
+                    else if (result[i][2] == 'S')
+                    {
+                        door = true;
+                        stair = true;
+                    }
+                    else if (result[i][2] == 'B')
+                    {
+                        door = true;
+                        window = true;
+                    }
                 }
 
-                if (roofType[i] == 'X')
+                CreateUBuilding(door, stair, window, ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                tempheight += ParamHeight[indexSize];
+                tempDasar += ParamHeight[indexSize];
+
+                if (result[i].Contains('-'))
                 {
-                    LRoof1(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
-                }else if(roofType[i] == 'Y')
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (j == '-')
+                        {
+                            counterLeft += 1;
+                        }
+                    }
+                }else if (result[i].Contains('+'))
                 {
-                    LRoof2(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (j == '+')
+                        {
+                            counterRight += 1;
+                        }
+                    }
                 }
-                UpdatePosition(new Vector3(ParamLength[i], 0, currentPosition.z));
-            }else if (initialShape[i] == 'D')
-            {
-                for (int j = 0; j < floorNum[i]; j++)
+                
+                if (result[i][1] == 'X')
                 {
-                    CreateRCBuilding(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
-                    tempheight += ParamHeight[i];
-                    tempDasar += ParamHeight[i];
+                    Uroof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                }else if(result[i][1] == 'Y')
+                {
+                    Uroof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
                 }
 
-                if (roofType[i] == 'X')
+                indexSize += 1;
+            }else if (result[i][0] == 'L')
+            {
+                if (result[i].Length > 2)
                 {
-                    RCRoof1(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
-                }else if(roofType[i] == 'Y')
-                {
-                    RCRoof2(ParamLength[i], ParamWidth[i], tempheight, ParamInnerLength[i], ParamInnerWidth[i], tempDasar);
+                    if (result[i][2] == 'W')
+                    {
+                        window = true;
+                    }
+                    else if (result[i][2] == 'D')
+                    {
+                        door = true;
+                    }
+                    else if (result[i][2] == 'A')
+                    {
+                        door = true;
+                        window = true;
+                        stair = true;
+                    }
+                    else if (result[i][2] == 'S')
+                    {
+                        door = true;
+                        stair = true;
+                    }
+                    else if (result[i][2] == 'B')
+                    {
+                        door = true;
+                        window = true;
+                    }
                 }
-                UpdatePosition(new Vector3(ParamLength[i], 0, currentPosition.z));
+
+                CreateLBuilding(door, stair, window,ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                tempheight += ParamHeight[indexSize];
+                tempDasar += ParamHeight[indexSize];
+
+                if (result[i].Contains('-'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (j == '-')
+                        {
+                            counterLeft += 1;
+                        }
+                    }
+                }else if (result[i].Contains('+'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (j == '+')
+                        {
+                            counterRight += 1;
+                        }
+                    }
+                }
+                
+                if (result[i][1] == 'X')
+                {
+                    LRoof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                }else if(result[i][1] == 'Y')
+                {
+                    LRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                }
+
+                indexSize += 1;
+            }else if (result[i][0] == 'R')
+            {
+                if (result[i].Length > 2)
+                {
+                    if (result[i][2] == 'W')
+                    {
+                        window = true;
+                    }
+                    else if (result[i][2] == 'D')
+                    {
+                        door = true;
+                    }
+                    else if (result[i][2] == 'A')
+                    {
+                        door = true;
+                        window = true;
+                        stair = true;
+                    }
+                    else if (result[i][2] == 'S')
+                    {
+                        door = true;
+                        stair = true;
+                    }
+                    else if (result[i][2] == 'B')
+                    {
+                        door = true;
+                        window = true;
+                    }
+                }
+
+                CreateRCBuilding(door, stair, window, ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                tempheight += ParamHeight[indexSize];
+                tempDasar += ParamHeight[indexSize];
+               
+                if (result[i].Contains('-'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (j == '-')
+                        {
+                            counterLeft += 1;
+                        }
+                    }
+                }else if (result[i].Contains('+'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (j == '+')
+                        {
+                            counterRight += 1;
+                        }
+                    }
+                }
+
+                if (result[i][1] == 'X')
+                {
+                    RCRoof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                }else if(result[i][1] == 'Y')
+                {
+                    RCRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                }
+
+                indexSize += 1;
+            }else if (result[i][0] == 'P')
+            {
+                UpdatePosition(new Vector3(ParamXPosition[indexPos], ParamYPosition[indexPos], ParamZPosition[indexPos]));
+                indexPos += 1;
             }
         }
         // currentPosition = transform.position;
@@ -171,11 +370,10 @@ public class LSystem : MonoBehaviour
     void UpdatePosition(Vector3 lastPos)
     {
         Quaternion rotation = transform.rotation;
-        Debug.Log(currentPosition);
-        currentPosition += rotation * lastPos;
+        currentPosition = lastPos;
     }
 
-    void CreateCubeMesh(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f, float _doorWidth = 0f)
+    void CreateCubeMesh(bool door, bool stair, bool window, float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f, float _doorWidth = 0f)
     {
         // Create a new cube GameObject
         GameObject cube = new GameObject("Cube");
@@ -236,18 +434,26 @@ public class LSystem : MonoBehaviour
             3, 2, 6,
         };
 
-        Debug.Log(tempLenght);
-        
         Vector3[] trimmedArray = TrimArray(cubeVertices, 4);
-        AddProceduralDoor(cubeVertices[0], cubeVertices[1], _height, cube);
-        AddProceduralWindow(trimmedArray, _height, cube, cubeVertices[0], cubeVertices[1]);
+        if (door && window)
+        {
+            AddProceduralDoor(cubeVertices[0], cubeVertices[1], _height, cube, stair);
+            AddProceduralWindow(trimmedArray, _height, cube, cubeVertices[0], cubeVertices[1]);
+        }
+        else if (door)
+        {
+            AddProceduralDoor(cubeVertices[0], cubeVertices[1], _height, cube, stair);
+        }else if (window)
+        {
+            AddProceduralWindow(trimmedArray, _height, cube);
+        }
 
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
     }
     
-    void AddProceduralDoor(Vector3 doorStart, Vector3 doorEnd, float _height, GameObject parent)
+    void AddProceduralDoor(Vector3 doorStart, Vector3 doorEnd, float _height, GameObject parent, bool stair)
     {
         float doorHeight = 0;
         float maxDoorWidth = 3f;
@@ -278,14 +484,11 @@ public class LSystem : MonoBehaviour
         {
             doorHeight = 5;
         }
-        
-        Debug.Log(Vector3.Distance(q3, q1) > maxDoorWidth);
         Vector3 midpoint = (doorStart + doorEnd) / 2.0f;
         Vector3[] doorVertices = new Vector3[4];
         
         if(Vector3.Distance(q3, q1) > maxDoorWidth)
         {
-            Debug.Log("this");
             doorVertices = new Vector3[]
             {
                 new Vector3(midpoint.x - (maxDoorWidth/2), currentPosition.y, midpoint.z - 0.001f),
@@ -385,7 +588,6 @@ public class LSystem : MonoBehaviour
             meshStair.vertices = stairVertices;
             meshStair.triangles = stairTriangles;
             mesh.RecalculateNormals();
-            Debug.Log(stairVertices[13]);
         }
 
         mesh.vertices = doorVertices;
@@ -518,7 +720,7 @@ public class LSystem : MonoBehaviour
         mesh.RecalculateNormals();
     }
 
-    public void CreateUBuilding(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    public void CreateUBuilding(bool door, bool stair, bool window, float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
         // Create a new pyramid GameObject
         GameObject UBuilding = new GameObject("UBuilding");
@@ -609,8 +811,18 @@ public class LSystem : MonoBehaviour
         
         Vector3[] trimmedArray = TrimArray(uVertices, 8);
         
-        AddProceduralDoor(uVertices[2], uVertices[3], _height, UBuilding);
-        AddProceduralWindow(trimmedArray, _height, UBuilding, uVertices[2], uVertices[3]);
+        if (door && window)
+        {
+            AddProceduralDoor(uVertices[2], uVertices[3], _height, UBuilding, stair);
+            AddProceduralWindow(trimmedArray, _height, UBuilding, uVertices[2], uVertices[3]);
+        }
+        else if (door)
+        {
+            AddProceduralDoor(uVertices[2], uVertices[3], _height, UBuilding, stair);
+        }else if (window)
+        {
+            AddProceduralWindow(trimmedArray, _height, UBuilding);
+        }
     }
     
     public void AddProceduralWindow(Vector3[] positionPoint, float _height, GameObject parent, Vector3 doorStart = default, Vector3 doorEnd = default)
@@ -656,8 +868,7 @@ public class LSystem : MonoBehaviour
                     0, 2, 3,
                 };
 
-                Vector3 normal = Vector3
-                    .Cross(windowVertices[1] - windowVertices[0], windowVertices[2] - windowVertices[0]).normalized;
+                Vector3 normal = Vector3.Cross(windowVertices[1] - windowVertices[0], windowVertices[2] - windowVertices[0]).normalized;
 
                 // Assume the camera is looking along the positive z-axis
                 Vector3 viewDirection = Vector3.forward;
@@ -702,7 +913,7 @@ public class LSystem : MonoBehaviour
         return (1 - t) * start + t * end;
     }
 
-    public void CreateLBuilding(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    public void CreateLBuilding(bool door, bool stair, bool window, float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
         GameObject LBuilding = new GameObject("LBuilding");
 
@@ -767,15 +978,25 @@ public class LSystem : MonoBehaviour
         
         Vector3[] trimmedArray = TrimArray(LVertices, 6);
         
-        AddProceduralWindow(trimmedArray, _height, LBuilding, LVertices[0], LVertices[1]);
-        AddProceduralDoor(LVertices[0], LVertices[1], _height, LBuilding);
-
+        if (door && window)
+        {
+            AddProceduralDoor(LVertices[0], LVertices[1], _height, LBuilding, stair);
+            AddProceduralWindow(trimmedArray, _height, LBuilding, LVertices[0], LVertices[1]);
+        }
+        else if (door)
+        {
+            AddProceduralDoor(LVertices[0], LVertices[1], _height, LBuilding, stair);
+        }else if (window)
+        {
+            AddProceduralWindow(trimmedArray, _height, LBuilding);
+        }
+        
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
     }
 
-    public void CreateRCBuilding(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    public void CreateRCBuilding(bool door, bool stair, bool window, float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
         GameObject RCBuilding = new GameObject("RCBuilding");
 
@@ -844,8 +1065,18 @@ public class LSystem : MonoBehaviour
         
         Vector3[] trimmedArray = TrimArray(RCVertices, 5);
         
-        AddProceduralWindow(trimmedArray, _height, RCBuilding, RCVertices[0], RCVertices[1]);
-        AddProceduralDoor(RCVertices[0], RCVertices[1], _height, RCBuilding);
+        if (door && window)
+        {
+            AddProceduralDoor(RCVertices[0], RCVertices[1], _height, RCBuilding, stair);
+            AddProceduralWindow(trimmedArray, _height, RCBuilding, RCVertices[0], RCVertices[1]);
+        }
+        else if (door)
+        {
+            AddProceduralDoor(RCVertices[0], RCVertices[1], _height, RCBuilding, stair);
+        }else if (window)
+        {
+            AddProceduralWindow(trimmedArray, _height, RCBuilding);
+        }
     }
 
     public void Uroof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)

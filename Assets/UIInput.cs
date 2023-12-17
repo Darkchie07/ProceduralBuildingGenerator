@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ public class UIInput : MonoBehaviour
     public Transform parents;
     public GameObject inputBuild1;
     public GameObject inputBuild2;
+    public GameObject inputPosition;
     public List<char> initialShape;
     public List<int> floorNum;
     public List<char> roofType;
@@ -20,133 +22,165 @@ public class UIInput : MonoBehaviour
     public List<float> _paramHeight;
     public List<float> _paramInnerLength;
     public List<float> _paramInnerWidth;
+    public List<float> _paramXPosition;
+    public List<float> _paramYPosition;
+    public List<float> _paramZPosition;
+    private string[] result;
 
     public GameObject errorPanel;
     public GameObject inputPanel;
     
-    List<char> validShape = new List<char> { 'A', 'B', 'C', 'D' };
-    List<char> validRoof = new List<char> { 'X', 'Y' };
     // Start is called before the first frame update
+    
     public void Next()
     {
-        ParseAndGeneratePatterns(axiom.text);
-        if (initialShape.Count == floorNum.Count && floorNum.Count == roofType.Count && CheckShape() && CheckRoof())
-        {
-            inputPanel.SetActive(true);
-            SetInputField();
-        }
-        else
-        {
-            errorPanel.SetActive(true);
-        }
+        string inputString = axiom.text;
+        char[] delimiters = { 'C', 'L', 'P', 'U', 'R' };
+        result = SplitString(inputString, delimiters);
+        SetInputField();
+        inputPanel.SetActive(true);
     }
-    
-    public bool CheckShape()
+    //
+    // public bool CheckShape()
+    // {
+    //     foreach (char character in initialShape)
+    //     {
+    //         if (!validShape.Contains(character))
+    //         {
+    //             return false; // Invalid character found
+    //         }
+    //     }
+    //     return true;
+    // }
+    //
+    // public bool CheckRoof()
+    // {
+    //     foreach (char character in roofType)
+    //     {
+    //         if (!validRoof.Contains(character))
+    //         {
+    //             return false; // Invalid character found
+    //         }
+    //     }
+    //     return true;
+    // }
+    //
+    // public void ParseAndGeneratePatterns(string userInput)
+    // {
+    //     int currentIndex = 0;
+    //
+    //     while (currentIndex < userInput.Length)
+    //     {
+    //         string currentPattern = ExtractPattern(userInput, ref currentIndex);
+    //         if (currentPattern != null)
+    //         {
+    //             GeneratePattern(currentPattern);
+    //         }
+    //     }
+    // }
+    //
+    // public string ExtractPattern(string userInput, ref int currentIndex)
+    // {
+    //     StringBuilder patternBuilder = new StringBuilder();
+    //
+    //     try
+    //     {
+    //         // Extract the first shape 'X' or 'Y'
+    //         patternBuilder.Append(userInput[currentIndex]);
+    //         currentIndex++;
+    //
+    //         // Extract the number part 'Y'
+    //         while (currentIndex < userInput.Length && char.IsDigit(userInput[currentIndex]))
+    //         {
+    //             patternBuilder.Append(userInput[currentIndex]);
+    //             currentIndex++;
+    //         }
+    //
+    //         // Extract the second shape 'Z'
+    //         patternBuilder.Append(userInput[currentIndex]);
+    //         currentIndex++;
+    //
+    //         return patternBuilder.ToString();
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         return null;
+    //     }
+    // }
+    //
+    // public void GeneratePattern(string pattern)
+    // {
+    //     char firstShape = pattern[0];
+    //     initialShape.Add(firstShape);
+    //
+    //     // Extract the number 'Y' from the pattern
+    //     int yIndex = 1;
+    //     while (yIndex < pattern.Length && char.IsDigit(pattern[yIndex]))
+    //     {
+    //         yIndex++;
+    //     }
+    //
+    //     if (!int.TryParse(pattern.Substring(1, yIndex - 1), out int duplicationCount))
+    //     {
+    //         return;
+    //     }
+    //     
+    //     floorNum.Add(duplicationCount);
+    //
+    //     char topShape = pattern[yIndex];
+    //     roofType.Add(topShape);
+    //
+    //     StringBuilder result = new StringBuilder();
+    //
+    //     for (int i = 0; i < duplicationCount; i++)
+    //     {
+    //         result.Append(firstShape);
+    //     }
+    //
+    //     result.Append(topShape);
+    // }
+
+    string[] SplitString(string input, char[] delimiters)
     {
-        foreach (char character in initialShape)
+        List<string> result = new List<string>();
+        string currentSegment = "";
+
+        foreach (char c in input)
         {
-            if (!validShape.Contains(character))
+            if (System.Array.IndexOf(delimiters, c) != -1)
             {
-                return false; // Invalid character found
+                // Keep the delimiter with the next character
+                if (!string.IsNullOrEmpty(currentSegment))
+                {
+                    result.Add(currentSegment);
+                }
+
+                currentSegment = c.ToString();
+            }
+            else
+            {
+                currentSegment += c;
             }
         }
-        return true;
+
+        if (!string.IsNullOrEmpty(currentSegment))
+        {
+            result.Add(currentSegment);
+        }
+
+        return result.ToArray();
     }
-    
-    public bool CheckRoof()
-    {
-        foreach (char character in roofType)
-        {
-            if (!validRoof.Contains(character))
-            {
-                return false; // Invalid character found
-            }
-        }
-        return true;
-    }
-    
-    public void ParseAndGeneratePatterns(string userInput)
-    {
-        int currentIndex = 0;
-
-        while (currentIndex < userInput.Length)
-        {
-            string currentPattern = ExtractPattern(userInput, ref currentIndex);
-            if (currentPattern != null)
-            {
-                GeneratePattern(currentPattern);
-            }
-        }
-    }
-    
-    public string ExtractPattern(string userInput, ref int currentIndex)
-    {
-        StringBuilder patternBuilder = new StringBuilder();
-
-        try
-        {
-            // Extract the first shape 'X' or 'Y'
-            patternBuilder.Append(userInput[currentIndex]);
-            currentIndex++;
-
-            // Extract the number part 'Y'
-            while (currentIndex < userInput.Length && char.IsDigit(userInput[currentIndex]))
-            {
-                patternBuilder.Append(userInput[currentIndex]);
-                currentIndex++;
-            }
-
-            // Extract the second shape 'Z'
-            patternBuilder.Append(userInput[currentIndex]);
-            currentIndex++;
-
-            return patternBuilder.ToString();
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
-    }
-
-    public void GeneratePattern(string pattern)
-    {
-        char firstShape = pattern[0];
-        initialShape.Add(firstShape);
-
-        // Extract the number 'Y' from the pattern
-        int yIndex = 1;
-        while (yIndex < pattern.Length && char.IsDigit(pattern[yIndex]))
-        {
-            yIndex++;
-        }
-
-        if (!int.TryParse(pattern.Substring(1, yIndex - 1), out int duplicationCount))
-        {
-            return;
-        }
-        
-        floorNum.Add(duplicationCount);
-
-        char topShape = pattern[yIndex];
-        roofType.Add(topShape);
-
-        StringBuilder result = new StringBuilder();
-
-        for (int i = 0; i < duplicationCount; i++)
-        {
-            result.Append(firstShape);
-        }
-
-        result.Append(topShape);
-    }
-
     public void SetInputField()
     {
-        for (int i = 0; i < initialShape.Count; i++)
+        for (int i = 0; i < result.Length; i++)
         {
-            if (initialShape[i] == 'A')
+            if (result[i][0] == 'C')
             {
                 Instantiate(inputBuild1, parents.transform);
+            }
+            else if(result[i][0] == 'P')
+            {
+                Instantiate(inputPosition, parents.transform);
             }
             else
             {
@@ -162,8 +196,11 @@ public class UIInput : MonoBehaviour
         GameObject[] height = GameObject.FindGameObjectsWithTag("Height");
         GameObject[] innerLength = GameObject.FindGameObjectsWithTag("innerLength");
         GameObject[] innerWidth = GameObject.FindGameObjectsWithTag("innerWidth");
+        GameObject[] Xposition = GameObject.FindGameObjectsWithTag("xposition");
+        GameObject[] Yposition = GameObject.FindGameObjectsWithTag("yposition");
+        GameObject[] Zposition = GameObject.FindGameObjectsWithTag("zposition");
 
-        for (int i = 0; i < initialShape.Count; i++)
+        for (int i = 0; i < length.Length; i++)
         {
             _paramLength.Add(float.Parse(length[i].GetComponent<TMP_InputField>().text));
             _paramWidth.Add(float.Parse(width[i].GetComponent<TMP_InputField>().text));
@@ -172,17 +209,33 @@ public class UIInput : MonoBehaviour
             _paramInnerWidth.Add(float.Parse(innerWidth[i].GetComponent<TMP_InputField>().text));
         }
 
-        if (CheckValidParameter())
+        for (int i = 0; i < Xposition.Length; i++)
         {
-            // Instantiate an empty GameObject
-            GameObject emptyGameObject = new GameObject("EmptyGameObject");
-
-            // You can also set the position, rotation, and parent if needed
-            emptyGameObject.transform.position = new Vector3(0f, 0f, 0f);
-            emptyGameObject.transform.rotation = Quaternion.identity;
-            LSystem lSystem = emptyGameObject.AddComponent<LSystem>();
-            lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth);
+            _paramXPosition.Add(float.Parse(Xposition[i].GetComponent<TMP_InputField>().text));
+            _paramYPosition.Add(float.Parse(Yposition[i].GetComponent<TMP_InputField>().text));
+            _paramZPosition.Add(float.Parse(Zposition[i].GetComponent<TMP_InputField>().text));
         }
+        
+        //Instantiate an empty GameObject
+        GameObject emptyGameObject = new GameObject("EmptyGameObject");
+    
+        // You can also set the position, rotation, and parent if needed
+        emptyGameObject.transform.position = new Vector3(0f, 0f, 0f);
+        emptyGameObject.transform.rotation = Quaternion.identity;
+        LSystem lSystem = emptyGameObject.AddComponent<LSystem>();
+        lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth, _paramXPosition, _paramYPosition, _paramZPosition, result);
+
+        // if (CheckValidParameter())
+        // {
+        //     // Instantiate an empty GameObject
+        //     GameObject emptyGameObject = new GameObject("EmptyGameObject");
+        //
+        //     // You can also set the position, rotation, and parent if needed
+        //     emptyGameObject.transform.position = new Vector3(0f, 0f, 0f);
+        //     emptyGameObject.transform.rotation = Quaternion.identity;
+        //     LSystem lSystem = emptyGameObject.AddComponent<LSystem>();
+        //     lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth);
+        // }
     }
 
     public bool CheckValidParameter()
@@ -196,4 +249,5 @@ public class UIInput : MonoBehaviour
         }
         return true;
     }
+
 }
