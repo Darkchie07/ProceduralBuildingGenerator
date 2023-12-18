@@ -16,6 +16,7 @@ public class LSystem : MonoBehaviour
 
     public string axiom = "FTFTUF";
     private Vector3 currentPosition;
+    public List<Vector3> lastCenter = new List<Vector3>();
     public List<GameObject> lastObject = new List<GameObject>();
 
     public List<char> initialShape;
@@ -40,7 +41,7 @@ public class LSystem : MonoBehaviour
 
     void Start()
     {
-        currentPosition = new Vector3(1, 0, 1);
+        currentPosition = Vector3.zero;
         GenerateLSystem();
     }
     public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth
@@ -103,36 +104,37 @@ public class LSystem : MonoBehaviour
                 tempheight += ParamHeight[indexSize];
                 tempDasar += ParamHeight[indexSize];
 
-                if (result[i].Contains('-'))
-                {
-                    for (int j = 0; j < result[i].Length; j++)
-                    {
-                        if (j == '-')
-                        {
-                            counterLeft += 1;
-                            RotateObject(lastObject, counterLeft * -90);
-                        }
-                    }
-                }else if (result[i].Contains('+'))
-                {
-                    for (int j = 0; j < result[i].Length; j++)
-                    {
-                        if (j == '+')
-                        {
-                            counterRight += 1;
-                            RotateObject(lastObject, counterLeft * 90);
-                        }
-                    }
-                }
-
                 if (result[i][1] == 'X')
                 {
                     CreatePyramid(ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar);
                 }else if (result[i][1] == 'Y')
                 {
-                    CreatePyramid(ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar);
+                    CRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar);
                 }
 
+                if (result[i].Contains('-'))
+                {
+                    Debug.Log("Yes");
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (result[i][j] == '-')
+                        {
+                            counterLeft += 1;
+                        }
+                    }
+                    RotateObject(lastCenter, lastObject, counterLeft * -90);
+                }else if (result[i].Contains('+'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (result[i][j] == '+')
+                        {
+                            counterRight += 1;
+                        }
+                    }
+                    RotateObject(lastCenter, lastObject, counterRight * 90);
+                }
+                
                 indexSize += 1;
             }else if (result[i][0] == 'U')
             {
@@ -188,7 +190,7 @@ public class LSystem : MonoBehaviour
                             counterLeft += 1;
                         }
                     }
-                    RotateObject(lastObject, counterLeft * -90);
+                    RotateObject(lastCenter, lastObject, counterLeft * -90);
                 }else if (result[i].Contains('+'))
                 {
                     for (int j = 0; j < result[i].Length; j++)
@@ -198,8 +200,9 @@ public class LSystem : MonoBehaviour
                             counterRight += 1;
                         }
                     }
-                    RotateObject(lastObject, counterRight * 90);
+                    RotateObject(lastCenter, lastObject, counterRight * 90);
                 }
+                
                 indexSize += 1;
             }else if (result[i][0] == 'L')
             {
@@ -236,28 +239,6 @@ public class LSystem : MonoBehaviour
                 tempheight += ParamHeight[indexSize];
                 tempDasar += ParamHeight[indexSize];
 
-                if (result[i].Contains('-'))
-                {
-                    for (int j = 0; j < result[i].Length; j++)
-                    {
-                        if (j == '-')
-                        {
-                            counterLeft += 1;
-                            RotateObject(lastObject, counterLeft * -90);
-                        }
-                    }
-                }else if (result[i].Contains('+'))
-                {
-                    for (int j = 0; j < result[i].Length; j++)
-                    {
-                        if (j == '+')
-                        {
-                            counterRight += 1;
-                            RotateObject(lastObject, counterLeft * 90);
-                        }
-                    }
-                }
-                
                 if (result[i][1] == 'X')
                 {
                     LRoof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
@@ -266,6 +247,29 @@ public class LSystem : MonoBehaviour
                     LRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
                 }
 
+                if (result[i].Contains('-'))
+                {
+                    Debug.Log("Yes");
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (result[i][j] == '-')
+                        {
+                            counterLeft += 1;
+                        }
+                    }
+                    RotateObject(lastCenter, lastObject, counterLeft * -90);
+                }else if (result[i].Contains('+'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (result[i][j] == '+')
+                        {
+                            counterRight += 1;
+                        }
+                    }
+                    RotateObject(lastCenter, lastObject, counterRight * 90);
+                }
+                
                 indexSize += 1;
             }else if (result[i][0] == 'R')
             {
@@ -302,28 +306,6 @@ public class LSystem : MonoBehaviour
                 tempheight += ParamHeight[indexSize];
                 tempDasar += ParamHeight[indexSize];
                
-                if (result[i].Contains('-'))
-                {
-                    for (int j = 0; j < result[i].Length; j++)
-                    {
-                        if (j == '-')
-                        {
-                            counterLeft += 1;
-                            RotateObject(lastObject, counterLeft * -90);
-                        }
-                    }
-                }else if (result[i].Contains('+'))
-                {
-                    for (int j = 0; j < result[i].Length; j++)
-                    {
-                        if (j == '+')
-                        {
-                            counterRight += 1;
-                            RotateObject(lastObject, counterLeft * 90);
-                        }
-                    }
-                }
-                
                 if (result[i][1] == 'X')
                 {
                     RCRoof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
@@ -331,7 +313,29 @@ public class LSystem : MonoBehaviour
                 {
                     RCRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
                 }
-
+                if (result[i].Contains('-'))
+                {
+                    Debug.Log("Yes");
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (result[i][j] == '-')
+                        {
+                            counterLeft += 1;
+                        }
+                    }
+                    RotateObject(lastCenter, lastObject, counterLeft * -90);
+                }else if (result[i].Contains('+'))
+                {
+                    for (int j = 0; j < result[i].Length; j++)
+                    {
+                        if (result[i][j] == '+')
+                        {
+                            counterRight += 1;
+                        }
+                    }
+                    RotateObject(lastCenter, lastObject, counterRight * 90);
+                }
+                
                 indexSize += 1;
             }else if (result[i][0] == 'P')
             {
@@ -404,16 +408,16 @@ public class LSystem : MonoBehaviour
         Vector3[] cubeVertices = new Vector3[]
         {
             // Front face
-            new Vector3(currentPosition.x, _dasar, currentPosition.z),
-            new Vector3(tempLenght, _dasar, currentPosition.z),
-            new Vector3(tempLenght, _dasar, _width + currentPosition.z),
-            new Vector3(currentPosition.x, _dasar, _width + currentPosition.z),
+            new Vector3(currentPosition.x, currentPosition.y, currentPosition.z),
+            new Vector3(tempLenght, currentPosition.y, currentPosition.z),
+            new Vector3(tempLenght, currentPosition.y, _width + currentPosition.z),
+            new Vector3(currentPosition.x, currentPosition.y, _width + currentPosition.z),
 
             // Back face
-            new Vector3(currentPosition.x, _height, currentPosition.z),
-            new Vector3(tempLenght, _height, currentPosition.z),
-            new Vector3(tempLenght, _height, _width + currentPosition.z),
-            new Vector3(currentPosition.x, _height, _width + currentPosition.z),
+            new Vector3(currentPosition.x, _height + currentPosition.y, currentPosition.z),
+            new Vector3(tempLenght, _height + currentPosition.y, currentPosition.z),
+            new Vector3(tempLenght, _height + currentPosition.y, _width + currentPosition.z),
+            new Vector3(currentPosition.x, _height + currentPosition.y, _width + currentPosition.z),
         };
 
         // Define triangles for the cube
@@ -457,10 +461,21 @@ public class LSystem : MonoBehaviour
         {
             AddProceduralWindow(trimmedArray, _height, cube);
         }
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in cubeVertices)
+        {
+            center += vertex;
+        }
+
+        center /= cubeVertices.Length;
 
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
+        
+        lastCenter.Add(center);
         lastObject.Add(cube);
     }
     
@@ -631,13 +646,13 @@ public class LSystem : MonoBehaviour
         Vector3[] pyramidVertices = new Vector3[]
         {
             // Front face
-            new Vector3(currentPosition.x, _dasar, currentPosition.z),
-            new Vector3(currentPosition.x, _dasar, _width + currentPosition.z),
-            new Vector3(tempLenght, _dasar, _width + currentPosition.z),
-            new Vector3(tempLenght, _dasar, currentPosition.z),
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z),
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, _width + currentPosition.z),
+            new Vector3(tempLenght, _dasar + currentPosition.y, _width + currentPosition.z),
+            new Vector3(tempLenght, _dasar + currentPosition.y, currentPosition.z),
 
             // Back face
-            new Vector3(centerX, _height, centerZ),
+            new Vector3(centerX, _height + currentPosition.y, centerZ),
         };
 
         // Define the triangles to form the cube's faces
@@ -664,6 +679,17 @@ public class LSystem : MonoBehaviour
         mesh.triangles = pyramidTriangles;
         // Optionally, calculate normals
         mesh.RecalculateNormals();
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in pyramidVertices)
+        {
+            center += vertex;
+        }
+
+        center /= pyramidVertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(pyramid);
     }
     
@@ -692,14 +718,14 @@ public class LSystem : MonoBehaviour
         Vector3[] pyramidVertices = new Vector3[]
         {
             // Front face
-            new Vector3(currentPosition.x, _dasar, currentPosition.z),
-            new Vector3(currentPosition.x, _dasar, _width),
-            new Vector3(tempLenght, _dasar, _width),
-            new Vector3(tempLenght, _dasar, currentPosition.z),
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z),
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, _width + currentPosition.z),
+            new Vector3(tempLenght, _dasar + currentPosition.y, _width + currentPosition.z),
+            new Vector3(tempLenght, _dasar + currentPosition.y, currentPosition.z),
 
             // Back face
-            new Vector3(currentPosition.x, _height, centerZ),
-            new Vector3(tempLenght, _height, centerZ),
+            new Vector3(currentPosition.x, _height + currentPosition.y, centerZ),
+            new Vector3(tempLenght, _height + currentPosition.y, centerZ),
         };
 
         // Define the triangles to form the cube's faces
@@ -712,20 +738,30 @@ public class LSystem : MonoBehaviour
             // Front face
             0, 1, 4,
             
-            // Back face
-            1, 2, 4,
+            1, 2, 5,
+            1, 5, 4,
             
-            // Left face
-            2, 3, 4,
+            0, 4, 3,
+            3, 4, 5,
             
-            // Right face
-            3, 0, 4,
+            2, 3, 5
         };
 
         mesh.vertices = pyramidVertices;
         mesh.triangles = pyramidTriangles;
         // Optionally, calculate normals
         mesh.RecalculateNormals();
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in pyramidVertices)
+        {
+            center += vertex;
+        }
+
+        center /= pyramidVertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(pyramid);
     }
 
@@ -749,27 +785,27 @@ public class LSystem : MonoBehaviour
         // Define the vertices of the cube
         Vector3[] uVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z), //1 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _innerWidth), //2 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _innerWidth), //3 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z), //4 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //6
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //7 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _width), //8
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _width), //9
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z), //1 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //2 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //3 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z), //4 
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //5
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //6
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //7 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _width), //8
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z + _width), //9
         
-            new Vector3(currentPosition.x, _height, currentPosition.z), //10 
-            new Vector3(currentPosition.x + tempInnerLength, _height, currentPosition.z), //11 
-            new Vector3(currentPosition.x + tempInnerLength, _height, currentPosition.z + _innerWidth), //12 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _height, currentPosition.z + _innerWidth), //13 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _height, currentPosition.z), //14 
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //15
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //16
-            new Vector3(currentPosition.x, _height, currentPosition.z + _width), //17 
-            new Vector3(currentPosition.x + tempInnerLength, _height, currentPosition.z + _width), //18
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _height, currentPosition.z + _width), //19
+            new Vector3(currentPosition.x, _height + currentPosition.y, currentPosition.z), //10 
+            new Vector3(currentPosition.x + tempInnerLength, _height + currentPosition.y, currentPosition.z), //11 
+            new Vector3(currentPosition.x + tempInnerLength, _height + currentPosition.y, currentPosition.z + _innerWidth), //12 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _height + currentPosition.y, currentPosition.z + _innerWidth), //13 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _height + currentPosition.y, currentPosition.z), //14 
+            new Vector3(currentPosition.x + _length, _height + currentPosition.y, currentPosition.z), //15
+            new Vector3(currentPosition.x + _length, _height + currentPosition.y, currentPosition.z + _width), //16
+            new Vector3(currentPosition.x, _height + currentPosition.y, currentPosition.z + _width), //17 
+            new Vector3(currentPosition.x + tempInnerLength, _height + currentPosition.y, currentPosition.z + _width), //18
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _height + currentPosition.y, currentPosition.z + _width), //19
         };
 
         // Define the triangles to form the cube's faces
@@ -818,6 +854,15 @@ public class LSystem : MonoBehaviour
         mesh.triangles = uTriangles;
         mesh.RecalculateNormals();
         
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in uVertices)
+        {
+            center += vertex;
+        }
+
+        center /= uVertices.Length;
+
         Vector3[] trimmedArray = TrimArray(uVertices, 8);
         
         if (door && window)
@@ -832,6 +877,7 @@ public class LSystem : MonoBehaviour
         {
             AddProceduralWindow(trimmedArray, _height, UBuilding);
         }
+        lastCenter.Add(center);
         lastObject.Add(UBuilding);
     }
     
@@ -939,19 +985,19 @@ public class LSystem : MonoBehaviour
         
         Vector3[] LVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //1
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //2 
-            new Vector3(currentPosition.x + _innerLength, _dasar, _width + currentPosition.z), //3 -
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //4 -
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //5 
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //1
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //2 
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, _width + currentPosition.z), //3 -
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //4 -
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //5 
 
-            new Vector3(currentPosition.x, _height, currentPosition.z), //6
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //7
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //8
-            new Vector3(currentPosition.x + _innerLength, _height, _width + currentPosition.z), //9 -
-            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + (_width - _innerWidth)), //10 -
-            new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)), //11
+            new Vector3(currentPosition.x, _height + currentPosition.y, currentPosition.z), //6
+            new Vector3(currentPosition.x + _length, _height + currentPosition.y, currentPosition.z), //7
+            new Vector3(currentPosition.x + _length, _height + currentPosition.y, currentPosition.z + _width), //8
+            new Vector3(currentPosition.x + _innerLength, _height + currentPosition.y, _width + currentPosition.z), //9 -
+            new Vector3(currentPosition.x + _innerLength, _height + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //10 -
+            new Vector3(currentPosition.x, _height + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //11
         };
 
         // Define the triangles to form the cube's faces
@@ -1004,6 +1050,17 @@ public class LSystem : MonoBehaviour
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in LVertices)
+        {
+            center += vertex;
+        }
+
+        center /= LVertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(LBuilding);
     }
 
@@ -1024,19 +1081,19 @@ public class LSystem : MonoBehaviour
         // Define the vertices of the cube
         Vector3[] RCVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z), //0
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //1 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //2
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //3 
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + _innerWidth), //4
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + _innerWidth), //5
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z), //0
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //1 
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //2
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //3 
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //5
     
-            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z), //0
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z), //1 
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //2
-            new Vector3(currentPosition.x, _height, currentPosition.z + _width), //3 
-            new Vector3(currentPosition.x, _height, currentPosition.z + _innerWidth), //4
-            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + _innerWidth), //5
+            new Vector3(currentPosition.x + _innerLength, _height + currentPosition.y, currentPosition.z), //0
+            new Vector3(currentPosition.x + _length, _height + currentPosition.y, currentPosition.z), //1 
+            new Vector3(currentPosition.x + _length, _height + currentPosition.y, currentPosition.z + _width), //2
+            new Vector3(currentPosition.x, _height + currentPosition.y, currentPosition.z + _width), //3 
+            new Vector3(currentPosition.x, _height + currentPosition.y, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength, _height + currentPosition.y, currentPosition.z + _innerWidth), //5
         };
 
         // Define the triangles to form the cube's faces
@@ -1088,6 +1145,17 @@ public class LSystem : MonoBehaviour
         {
             AddProceduralWindow(trimmedArray, _height, RCBuilding);
         }
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in RCVertices)
+        {
+            center += vertex;
+        }
+
+        center /= RCVertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(RCBuilding);
     }
 
@@ -1111,21 +1179,21 @@ public class LSystem : MonoBehaviour
         
         Vector3[] uRoof1Vertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z), //1 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _innerWidth), //2 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _innerWidth), //3 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z), //4 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //6
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //7 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _width), //8
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _width), //9
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z), //1 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //2 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //3 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z), //4 
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //5
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //6
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //7 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _width), //8
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength,  + currentPosition.y, currentPosition.z + _width), //9
             
-            new Vector3(currentPosition.x + (tempInnerLength / 2), _height, currentPosition.z), //10
-            new Vector3(currentPosition.x + (tempInnerLength / 2), _height, currentPosition.z + _innerWidth + tempInnerZ), //11
-            new Vector3((currentPosition.x + _length) - (_innerLength/2), _height, currentPosition.z + _innerWidth + tempInnerZ), //13
-            new Vector3((currentPosition.x + _length) - (_innerLength/2), _height, currentPosition.z), //12
+            new Vector3(currentPosition.x + (tempInnerLength / 2),  + currentPosition.y, currentPosition.z), //10
+            new Vector3(currentPosition.x + (tempInnerLength / 2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //11
+            new Vector3((currentPosition.x + _length) - (_innerLength/2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //13
+            new Vector3((currentPosition.x + _length) - (_innerLength/2), _height + currentPosition.y, currentPosition.z), //12
         };
         
         // Define the triangles to form the cube's faces
@@ -1164,6 +1232,17 @@ public class LSystem : MonoBehaviour
         mesh.vertices = uRoof1Vertices;
         mesh.triangles = uRoof1Triangles;
         mesh.RecalculateNormals();
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in uRoof1Vertices)
+        {
+            center += vertex;
+        }
+
+        center /= uRoof1Vertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(roof);
     }
     
@@ -1187,19 +1266,19 @@ public class LSystem : MonoBehaviour
         
         Vector3[] uRoof1Vertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z), //1 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _innerWidth), //2 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _innerWidth), //3 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z), //4 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //6
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //7 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar, currentPosition.z + _width), //8
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar, currentPosition.z + _width), //9
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z), //1 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //2 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //3 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z), //4 
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //5
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //6
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //7 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _width), //8
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z + _width), //9
             
-            new Vector3(currentPosition.x + (tempInnerLength / 2), _height, currentPosition.z + _innerWidth + tempInnerZ), //10
-            new Vector3((currentPosition.x + _length) - (_innerLength/2), _height, currentPosition.z + _innerWidth + tempInnerZ), //11
+            new Vector3(currentPosition.x + (tempInnerLength / 2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //10
+            new Vector3((currentPosition.x + _length) - (_innerLength/2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //11
         };
         
         // Define the triangles to form the cube's faces
@@ -1234,6 +1313,17 @@ public class LSystem : MonoBehaviour
         mesh.vertices = uRoof1Vertices;
         mesh.triangles = uRoof1Triangles;
         mesh.RecalculateNormals();
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in uRoof1Vertices)
+        {
+            center += vertex;
+        }
+
+        center /= uRoof1Vertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(roof);
     }
     
@@ -1254,16 +1344,16 @@ public class LSystem : MonoBehaviour
         
         Vector3[] LVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //1 
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //2 -
-            new Vector3(currentPosition.x + _innerLength, _dasar, _width + currentPosition.z), //3 -
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //1 
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //2 -
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, _width + currentPosition.z), //3 -
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //4 
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //5
 
             new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)/2),  //6
-            new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height, currentPosition.z + (_width - _innerWidth)/2),  //7
-            new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height, currentPosition.z + _width),  //8
+            new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height + currentPosition.y, currentPosition.z + (_width - _innerWidth)/2),  //7
+            new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height + currentPosition.y, currentPosition.z + _width),  //8
         };
 
         // Define the triangles to form the cube's faces
@@ -1294,6 +1384,17 @@ public class LSystem : MonoBehaviour
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in LVertices)
+        {
+            center += vertex;
+        }
+
+        center /= LVertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(roof);
     }
     
@@ -1314,14 +1415,14 @@ public class LSystem : MonoBehaviour
         
         Vector3[] LVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar, currentPosition.z), //0 
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + (_width - _innerWidth)), //1 
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + (_width - _innerWidth)), //2 -
-            new Vector3(currentPosition.x + _innerLength, _dasar,  + currentPosition.z), //3 -
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //4 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //5
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //1 
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //2 -
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y,  + currentPosition.z), //3 -
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //4 
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //5
 
-            new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height, currentPosition.z + (_width - _innerWidth)/2),  //6
+            new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height + currentPosition.y, currentPosition.z + (_width - _innerWidth)/2),  //6
         };
 
         // Define the triangles to form the cube's faces
@@ -1348,6 +1449,17 @@ public class LSystem : MonoBehaviour
         mesh.vertices = LVertices;
         mesh.triangles = LTriangles;
         mesh.RecalculateNormals();
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in LVertices)
+        {
+            center += vertex;
+        }
+
+        center /= LVertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(roof);
     }
     
@@ -1368,16 +1480,16 @@ public class LSystem : MonoBehaviour
         // Define the vertices of the cube
         Vector3[] RCVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z), //0
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //1 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //2
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //3 
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + _innerWidth), //4
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + _innerWidth), //5
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z), //0
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //1 
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //2
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //3 
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //5
     
-            new Vector3(currentPosition.x + _innerLength/2, _height, currentPosition.z + _innerWidth/2), //6
-            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + _innerWidth), //7
-            new Vector3(currentPosition.x + _length, _height, currentPosition.z + _width), //2
+            new Vector3(currentPosition.x + _innerLength/2, _height + currentPosition.y, currentPosition.z + _innerWidth/2), //6
+            new Vector3(currentPosition.x + _innerLength, _height + currentPosition.y, currentPosition.z + _innerWidth), //7
+            new Vector3(currentPosition.x + _length, _height + currentPosition.y, currentPosition.z + _width), //2
         };
 
         // Define the triangles to form the cube's faces
@@ -1407,6 +1519,17 @@ public class LSystem : MonoBehaviour
         mesh.vertices = RCVertices;
         mesh.triangles = RCTriangles;
         mesh.RecalculateNormals();
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in RCVertices)
+        {
+            center += vertex;
+        }
+
+        center /= RCVertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(roof);
     }
     
@@ -1427,14 +1550,14 @@ public class LSystem : MonoBehaviour
         // Define the vertices of the cube
         Vector3[] RCVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z), //0
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z), //1 
-            new Vector3(currentPosition.x + _length, _dasar, currentPosition.z + _width), //2
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + _width), //3 
-            new Vector3(currentPosition.x, _dasar, currentPosition.z + _innerWidth), //4
-            new Vector3(currentPosition.x + _innerLength, _dasar, currentPosition.z + _innerWidth), //5
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z), //0
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //1 
+            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //2
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //3 
+            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //5
     
-            new Vector3(currentPosition.x + _innerLength, _height, currentPosition.z + _innerWidth), //6
+            new Vector3(currentPosition.x + _innerLength, _height + currentPosition.y, currentPosition.z + _innerWidth), //6
         };
 
         // Define the triangles to form the cube's faces
@@ -1456,6 +1579,17 @@ public class LSystem : MonoBehaviour
         mesh.vertices = RCVertices;
         mesh.triangles = RCTriangles;
         mesh.RecalculateNormals();
+        
+        Vector3 center = Vector3.zero;
+
+        foreach (Vector3 vertex in RCVertices)
+        {
+            center += vertex;
+        }
+
+        center /= RCVertices.Length;
+        
+        lastCenter.Add(center);
         lastObject.Add(roof);
     }
     
@@ -1474,12 +1608,11 @@ public class LSystem : MonoBehaviour
         }
     }
 
-    public void RotateObject(List<GameObject> rotateObject, float angle)
+    public void RotateObject(List<Vector3> centerObject, List<GameObject> rotateObject, float angle)
     {
         for (int i = 0; i < rotateObject.Count; i++)
         {
-            Vector3 rotation = new Vector3(0, angle, 0);
-            rotateObject[i].transform.localEulerAngles = rotation;
+            rotateObject[i].transform.RotateAround(centerObject[i], Vector3.up, angle);
         }
     }
 }
