@@ -31,6 +31,8 @@ public class LSystem : MonoBehaviour
     public List<float> ParamXPosition;
     public List<float> ParamYPosition;
     public List<float> ParamZPosition;
+    public List<float> ParamXOffset;
+    public List<float> ParamYOffset;
     private string[] result;
     
     List<char> validShape = new List<char> { 'A', 'B', 'C', 'D' };
@@ -55,7 +57,7 @@ public class LSystem : MonoBehaviour
         GenerateLSystem();
     }
     public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth
-    , List<float> _paramXPosition, List<float> _paramYPosition, List<float> _paramZPosition, string[] _result, UnityEngine.Color _shape, UnityEngine.Color _roof, UnityEngine.Color _door, UnityEngine.Color _window, UnityEngine.Color _stair)
+    , List<float> _paramXPosition, List<float> _paramYPosition, List<float> _paramZPosition, List<float> _paramXoffset, List<float> _paramYoffset, string[] _result, UnityEngine.Color _shape, UnityEngine.Color _roof, UnityEngine.Color _door, UnityEngine.Color _window, UnityEngine.Color _stair)
     {
         initialShape = _initialShape;
         floorNum = _floorNum;
@@ -68,6 +70,8 @@ public class LSystem : MonoBehaviour
         ParamXPosition = _paramXPosition;
         ParamYPosition = _paramYPosition;
         ParamZPosition = _paramZPosition;
+        ParamXOffset = _paramXoffset;
+        ParamYOffset = _paramYoffset;
         result = _result;
         /*colorShape.color = _shape;
         colorRoof.color = _roof;

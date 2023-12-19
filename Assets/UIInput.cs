@@ -25,6 +25,8 @@ public class UIInput : MonoBehaviour
     public List<float> _paramXPosition;
     public List<float> _paramYPosition;
     public List<float> _paramZPosition;
+    public List<float> _paramXOffset;
+    public List<float> _paramYOffset;
     private string[] result;
 
     public GameObject errorPanel;
@@ -219,21 +221,25 @@ public class UIInput : MonoBehaviour
         GameObject[] Xposition = GameObject.FindGameObjectsWithTag("xposition");
         GameObject[] Yposition = GameObject.FindGameObjectsWithTag("yposition");
         GameObject[] Zposition = GameObject.FindGameObjectsWithTag("zposition");
+        GameObject[] Xoffset = GameObject.FindGameObjectsWithTag("XOffset");
+        GameObject[] Yoffset = GameObject.FindGameObjectsWithTag("YOffset");
 
         for (int i = 0; i < length.Length; i++)
         {
-            _paramLength.Add(float.Parse(length[i].GetComponent<TMP_InputField>().text));
-            _paramWidth.Add(float.Parse(width[i].GetComponent<TMP_InputField>().text));
-            _paramHeight.Add(float.Parse(height[i].GetComponent<TMP_InputField>().text));
-            _paramInnerLength.Add(float.Parse(innerLength[i].GetComponent<TMP_InputField>().text));
-            _paramInnerWidth.Add(float.Parse(innerWidth[i].GetComponent<TMP_InputField>().text));
+            _paramLength.Add(ParseFloatOrDefault(length[i].GetComponent<TMP_InputField>().text));
+            _paramWidth.Add(ParseFloatOrDefault(width[i].GetComponent<TMP_InputField>().text));
+            _paramHeight.Add(ParseFloatOrDefault(height[i].GetComponent<TMP_InputField>().text));
+            _paramInnerLength.Add(ParseFloatOrDefault(innerLength[i].GetComponent<TMP_InputField>().text));
+            _paramInnerWidth.Add(ParseFloatOrDefault(innerWidth[i].GetComponent<TMP_InputField>().text));
+            _paramXOffset.Add(ParseFloatOrDefault(Xoffset[i].GetComponent<TMP_InputField>().text));
+            _paramYOffset.Add(ParseFloatOrDefault(Yoffset[i].GetComponent<TMP_InputField>().text));
         }
 
         for (int i = 0; i < Xposition.Length; i++)
         {
-            _paramXPosition.Add(float.Parse(Xposition[i].GetComponent<TMP_InputField>().text));
-            _paramYPosition.Add(float.Parse(Yposition[i].GetComponent<TMP_InputField>().text));
-            _paramZPosition.Add(float.Parse(Zposition[i].GetComponent<TMP_InputField>().text));
+            _paramXPosition.Add(ParseFloatOrDefault(Xposition[i].GetComponent<TMP_InputField>().text));
+            _paramYPosition.Add(ParseFloatOrDefault(Yposition[i].GetComponent<TMP_InputField>().text));
+            _paramZPosition.Add(ParseFloatOrDefault(Zposition[i].GetComponent<TMP_InputField>().text));
         }
         
         //Instantiate an empty GameObject
@@ -243,7 +249,9 @@ public class UIInput : MonoBehaviour
         emptyGameObject.transform.position = new Vector3(0f, 0f, 0f);
         emptyGameObject.transform.rotation = Quaternion.identity;
         LSystem lSystem = emptyGameObject.AddComponent<LSystem>();
-        lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth, _paramXPosition, _paramYPosition, _paramZPosition, result, colorShape.color, colorRoof.color, colorDoor.color, colorWindow.color, fcpStair.color);
+        lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth, 
+            _paramXPosition, _paramYPosition, _paramZPosition, _paramXOffset,  _paramYOffset, result,
+            colorShape.color, colorRoof.color, colorDoor.color, colorWindow.color, fcpStair.color);
 
         Debug.Log(fcpShape.color);
         // if (CheckValidParameter())
@@ -259,6 +267,21 @@ public class UIInput : MonoBehaviour
         // }
     }
 
+    float ParseFloatOrDefault(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return 0f;
+        }
+
+        if (float.TryParse(input, out float result))
+        {
+            return result;
+        }
+
+        return 0f;
+    }
+    
     public bool CheckValidParameter()
     {
         for (int i = 0; i < _paramLength.Count; i++)
