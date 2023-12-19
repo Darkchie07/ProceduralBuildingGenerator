@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TMPro;
+using TMPro.EditorUtilities;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -37,15 +38,24 @@ public class LSystem : MonoBehaviour
 
     public GameObject prefabs;
 
-    public Material colorMaterial;
+    public Material colorShape;
+    public Material colorRoof;
+    public Material colorDoor;
+    public Material colorWindow;
+    public Material colorStair;
 
     void Start()
     {
+        colorShape = Resources.Load<Material>("Material/ShapeMaterial");
+        colorRoof = Resources.Load<Material>("Material/RoofMaterial");
+        colorDoor = Resources.Load<Material>("Material/DoorMaterial");
+        colorWindow = Resources.Load<Material>("Material/WindowMaterial");
+        colorStair = Resources.Load<Material>("Material/StairMaterial");
         currentPosition = Vector3.zero;
         GenerateLSystem();
     }
     public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth
-    , List<float> _paramXPosition, List<float> _paramYPosition, List<float> _paramZPosition, string[] _result)
+    , List<float> _paramXPosition, List<float> _paramYPosition, List<float> _paramZPosition, string[] _result, UnityEngine.Color _shape, UnityEngine.Color _roof, UnityEngine.Color _door, UnityEngine.Color _window, UnityEngine.Color _stair)
     {
         initialShape = _initialShape;
         floorNum = _floorNum;
@@ -59,6 +69,11 @@ public class LSystem : MonoBehaviour
         ParamYPosition = _paramYPosition;
         ParamZPosition = _paramZPosition;
         result = _result;
+        /*colorShape.color = _shape;
+        colorRoof.color = _roof;
+        colorDoor.color = _door;
+        colorWindow.color = _window;
+        colorStair.color = _stair;*/
     }
 
     void GenerateLSystem()
@@ -398,7 +413,7 @@ public class LSystem : MonoBehaviour
 
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorShape.color;
 
         Quaternion rotation = transform.rotation;
 
@@ -493,7 +508,7 @@ public class LSystem : MonoBehaviour
 
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material.color = UnityEngine.Color.black; // You can change this material as needed
+        meshRenderer.material.color = colorDoor.color; // You can change this material as needed
 
         float t1 = 0.25f;
         float t3 = 0.75f;
@@ -554,7 +569,7 @@ public class LSystem : MonoBehaviour
 
             Mesh meshStair = new Mesh();
             meshFilterStair.mesh = meshStair;
-            meshRendererStair.material.color = UnityEngine.Color.blue;
+            meshRendererStair.material.color = colorStair.color;
 
             Vector3[] stairVertices = new Vector3[]
             {
@@ -632,7 +647,7 @@ public class LSystem : MonoBehaviour
 
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorRoof.color;
 
         Quaternion rotation = transform.rotation;
 
@@ -704,7 +719,7 @@ public class LSystem : MonoBehaviour
 
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorRoof.color;
 
         Quaternion rotation = transform.rotation;
 
@@ -776,7 +791,7 @@ public class LSystem : MonoBehaviour
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorShape.color;
 
         Quaternion rotation = transform.rotation;
 
@@ -899,7 +914,7 @@ public class LSystem : MonoBehaviour
 
                 Mesh windowMesh = new Mesh();
                 windowMeshFilter.mesh = windowMesh;
-                windowMeshRenderer.material.color = UnityEngine.Color.blue; // Use the material you want for the window
+                windowMeshRenderer.material.color = colorWindow.color; // Use the material you want for the window
 
 
                 float t1 = 0.25f;
@@ -979,7 +994,7 @@ public class LSystem : MonoBehaviour
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorShape.color;
 
         Quaternion rotation = transform.rotation;
         
@@ -1074,7 +1089,7 @@ public class LSystem : MonoBehaviour
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorShape.color;
 
         Quaternion rotation = transform.rotation;
         
@@ -1170,7 +1185,7 @@ public class LSystem : MonoBehaviour
 
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorRoof.color;
         
         Quaternion rotation = transform.rotation;
 
@@ -1257,7 +1272,7 @@ public class LSystem : MonoBehaviour
 
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorRoof.color;
         
         Quaternion rotation = transform.rotation;
 
@@ -1337,7 +1352,7 @@ public class LSystem : MonoBehaviour
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorRoof.color;
 
         float tempInnerLength = (_length - _innerLength) / 2;
         Quaternion rotation = transform.rotation;
@@ -1408,7 +1423,7 @@ public class LSystem : MonoBehaviour
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorRoof.color;
 
         float tempInnerLength = (_length - _innerLength) / 2;
         Quaternion rotation = transform.rotation;
@@ -1473,7 +1488,7 @@ public class LSystem : MonoBehaviour
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorRoof.color;
 
         Quaternion rotation = transform.rotation;
         
@@ -1543,7 +1558,7 @@ public class LSystem : MonoBehaviour
         
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
-        meshRenderer.material = colorMaterial;
+        meshRenderer.material.color = colorRoof.color;
 
         Quaternion rotation = transform.rotation;
         

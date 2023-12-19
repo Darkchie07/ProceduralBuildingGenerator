@@ -29,9 +29,29 @@ public class UIInput : MonoBehaviour
 
     public GameObject errorPanel;
     public GameObject inputPanel;
+
+    public FlexibleColorPicker fcpShape;
+    public FlexibleColorPicker fcpRoof;
+    public FlexibleColorPicker fcpDoor;
+    public FlexibleColorPicker fcpWindow;
+    public FlexibleColorPicker fcpStair;
     
+    public Material colorShape;
+    public Material colorRoof;
+    public Material colorDoor;
+    public Material colorWindow;
+    public Material colorStair;
+
     // Start is called before the first frame update
-    
+    private void Start()
+    {
+        colorShape = Resources.Load<Material>("Material/ShapeMaterial");
+        colorRoof = Resources.Load<Material>("Material/RoofMaterial");
+        colorDoor = Resources.Load<Material>("Material/DoorMaterial");
+        colorWindow = Resources.Load<Material>("Material/WindowMaterial");
+        colorStair = Resources.Load<Material>("Material/StairMaterial");
+    }
+
     public void Next()
     {
         string inputString = axiom.text;
@@ -223,8 +243,9 @@ public class UIInput : MonoBehaviour
         emptyGameObject.transform.position = new Vector3(0f, 0f, 0f);
         emptyGameObject.transform.rotation = Quaternion.identity;
         LSystem lSystem = emptyGameObject.AddComponent<LSystem>();
-        lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth, _paramXPosition, _paramYPosition, _paramZPosition, result);
+        lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth, _paramXPosition, _paramYPosition, _paramZPosition, result, colorShape.color, colorRoof.color, colorDoor.color, colorWindow.color, fcpStair.color);
 
+        Debug.Log(fcpShape.color);
         // if (CheckValidParameter())
         // {
         //     // Instantiate an empty GameObject
@@ -248,6 +269,15 @@ public class UIInput : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public void SetMaterial()
+    {
+        colorShape.color = fcpShape.color;
+        colorRoof.color = fcpRoof.color;
+        colorDoor.color = fcpDoor.color;
+        colorWindow.color = fcpWindow.color;
+        colorStair.color = fcpStair.color;
     }
 
 }
