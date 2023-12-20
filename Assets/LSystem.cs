@@ -125,10 +125,10 @@ public class LSystem : MonoBehaviour
 
                 if (result[i][1] == 'X')
                 {
-                    CreatePyramid(ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar);
+                    CreatePyramid(ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar, ParamXOffset[indexSize], ParamYOffset[indexSize]);
                 }else if (result[i][1] == 'Y')
                 {
-                    CRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar);
+                    CRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, tempDasar, ParamXOffset[indexSize], ParamYOffset[indexSize]);
                 }
 
                 if (result[i].Contains('-'))
@@ -193,10 +193,10 @@ public class LSystem : MonoBehaviour
                 
                 if (result[i][1] == 'X')
                 {
-                    Uroof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                    Uroof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar, ParamXOffset[indexSize], ParamYOffset[indexSize]);
                 }else if(result[i][1] == 'Y')
                 {
-                    Uroof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                    Uroof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar, ParamXOffset[indexSize], ParamYOffset[indexSize]);
                 }
 
                 if (result[i].Contains('-'))
@@ -260,10 +260,10 @@ public class LSystem : MonoBehaviour
 
                 if (result[i][1] == 'X')
                 {
-                    LRoof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                    LRoof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar, ParamXOffset[indexSize], ParamYOffset[indexSize]);
                 }else if(result[i][1] == 'Y')
                 {
-                    LRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                    LRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar, ParamXOffset[indexSize], ParamYOffset[indexSize]);
                 }
 
                 if (result[i].Contains('-'))
@@ -327,10 +327,10 @@ public class LSystem : MonoBehaviour
                
                 if (result[i][1] == 'X')
                 {
-                    RCRoof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                    RCRoof1(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar, ParamXOffset[indexSize], ParamYOffset[indexSize]);
                 }else if(result[i][1] == 'Y')
                 {
-                    RCRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar);
+                    RCRoof2(ParamLength[indexSize], ParamWidth[indexSize], tempheight, ParamInnerLength[indexSize], ParamInnerWidth[indexSize], tempDasar, ParamXOffset[indexSize], ParamYOffset[indexSize]);
                 }
                 if (result[i].Contains('-'))
                 {
@@ -640,7 +640,7 @@ public class LSystem : MonoBehaviour
         mesh.RecalculateNormals();
     }
     
-    public void CreatePyramid(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
+    public void CreatePyramid(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         // Create a new pyramid GameObject
         GameObject pyramid = new GameObject("Pyramid");
@@ -665,10 +665,10 @@ public class LSystem : MonoBehaviour
         Vector3[] pyramidVertices = new Vector3[]
         {
             // Front face
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z),
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, _width + currentPosition.z),
-            new Vector3(tempLenght, _dasar + currentPosition.y, _width + currentPosition.z),
-            new Vector3(tempLenght, _dasar + currentPosition.y, currentPosition.z),
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset),
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, _width + currentPosition.z + _yoffset),
+            new Vector3(tempLenght + _xoffset, _dasar + currentPosition.y, _width + currentPosition.z + _yoffset),
+            new Vector3(tempLenght + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset),
 
             // Back face
             new Vector3(centerX, _height + currentPosition.y, centerZ),
@@ -712,7 +712,7 @@ public class LSystem : MonoBehaviour
         lastObject.Add(pyramid);
     }
     
-    public void CRoof2(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f)
+    public void CRoof2(float _length = 0f, float _width = 0f, float _height = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         // Create a new pyramid GameObject
         GameObject pyramid = new GameObject("Pyramid");
@@ -737,10 +737,10 @@ public class LSystem : MonoBehaviour
         Vector3[] pyramidVertices = new Vector3[]
         {
             // Front face
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z),
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, _width + currentPosition.z),
-            new Vector3(tempLenght, _dasar + currentPosition.y, _width + currentPosition.z),
-            new Vector3(tempLenght, _dasar + currentPosition.y, currentPosition.z),
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset),
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, _width + currentPosition.z + _yoffset),
+            new Vector3(tempLenght + _xoffset, _dasar + currentPosition.y, _width + currentPosition.z + _yoffset),
+            new Vector3(tempLenght + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset),
 
             // Back face
             new Vector3(currentPosition.x, _height + currentPosition.y, centerZ),
@@ -1178,7 +1178,7 @@ public class LSystem : MonoBehaviour
         lastObject.Add(RCBuilding);
     }
 
-    public void Uroof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    public void Uroof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         // Create a new cube GameObject
         GameObject roof = new GameObject("Roof");
@@ -1198,16 +1198,16 @@ public class LSystem : MonoBehaviour
         
         Vector3[] uRoof1Vertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z), //1 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //2 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //3 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z), //4 
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //5
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //6
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //7 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _width), //8
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength,  + currentPosition.y, currentPosition.z + _width), //9
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //0 
+            new Vector3(currentPosition.x + tempInnerLength + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //1 
+            new Vector3(currentPosition.x + tempInnerLength + _xoffset, _dasar + currentPosition.y, currentPosition.z + _innerWidth - _yoffset), //2 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength - _xoffset, _dasar + currentPosition.y, currentPosition.z + _innerWidth - _yoffset), //3 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength - _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //4 
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //5
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //6
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //7 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //8
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength,  + currentPosition.y, currentPosition.z + _width + _yoffset), //9
             
             new Vector3(currentPosition.x + (tempInnerLength / 2),  + currentPosition.y, currentPosition.z), //10
             new Vector3(currentPosition.x + (tempInnerLength / 2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //11
@@ -1265,7 +1265,7 @@ public class LSystem : MonoBehaviour
         lastObject.Add(roof);
     }
     
-    public void Uroof2(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    public void Uroof2(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         // Create a new cube GameObject
         GameObject roof = new GameObject("Roof");
@@ -1285,16 +1285,16 @@ public class LSystem : MonoBehaviour
         
         Vector3[] uRoof1Vertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z), //1 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //2 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //3 
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z), //4 
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //5
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //6
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //7 
-            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _width), //8
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength, _dasar + currentPosition.y, currentPosition.z + _width), //9
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //0 
+            new Vector3(currentPosition.x + tempInnerLength + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //1 
+            new Vector3(currentPosition.x + tempInnerLength + _xoffset, _dasar + currentPosition.y, currentPosition.z + _innerWidth - _yoffset), //2 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength - _xoffset, _dasar + currentPosition.y, currentPosition.z + _innerWidth - _yoffset), //3 
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength - _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //4 
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //5
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //6
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //7 
+            new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //8
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength,  + currentPosition.y, currentPosition.z + _width + _yoffset), //9
             
             new Vector3(currentPosition.x + (tempInnerLength / 2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //10
             new Vector3((currentPosition.x + _length) - (_innerLength/2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //11
@@ -1346,7 +1346,7 @@ public class LSystem : MonoBehaviour
         lastObject.Add(roof);
     }
     
-    public void LRoof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    public void LRoof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         GameObject roof = new GameObject("LRoof");
 
@@ -1363,12 +1363,12 @@ public class LSystem : MonoBehaviour
         
         Vector3[] LVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //1 
-            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //2 -
-            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, _width + currentPosition.z), //3 -
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //4 
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //5
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //0 
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth) + _yoffset), //1 
+            new Vector3(currentPosition.x + _innerLength - _xoffset, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth) + _yoffset), //2 -
+            new Vector3(currentPosition.x + _innerLength - _xoffset, _dasar + currentPosition.y, _width + currentPosition.z + _yoffset), //3 -
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //4 
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //5
 
             new Vector3(currentPosition.x, _height, currentPosition.z + (_width - _innerWidth)/2),  //6
             new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height + currentPosition.y, currentPosition.z + (_width - _innerWidth)/2),  //7
@@ -1417,7 +1417,7 @@ public class LSystem : MonoBehaviour
         lastObject.Add(roof);
     }
     
-    public void LRoof2(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    public void LRoof2(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         GameObject roof = new GameObject("LRoof");
 
@@ -1434,12 +1434,12 @@ public class LSystem : MonoBehaviour
         
         Vector3[] LVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z), //0 
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //1 
-            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth)), //2 -
-            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y,  + currentPosition.z), //3 -
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //4 
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //5
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //0 
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth) + _yoffset), //1 
+            new Vector3(currentPosition.x + _innerLength - _xoffset, _dasar + currentPosition.y, currentPosition.z + (_width - _innerWidth) + _yoffset), //2 -
+            new Vector3(currentPosition.x + _innerLength - _xoffset, _dasar + currentPosition.y, _width + currentPosition.z + _yoffset), //3 -
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //4 
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //5
 
             new Vector3(currentPosition.x + _innerLength + tempInnerLength, _height + currentPosition.y, currentPosition.z + (_width - _innerWidth)/2),  //6
         };
@@ -1482,7 +1482,7 @@ public class LSystem : MonoBehaviour
         lastObject.Add(roof);
     }
     
-    public void RCRoof1(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    public void RCRoof1(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         GameObject roof = new GameObject("RCBuilding");
 
@@ -1499,11 +1499,11 @@ public class LSystem : MonoBehaviour
         // Define the vertices of the cube
         Vector3[] RCVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z), //0
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //1 
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //2
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //3 
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength - _xoffset, _dasar + currentPosition.y, currentPosition.z -_yoffset), //0
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //1 
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //2
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //3 
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + _innerWidth - _yoffset), //4
             new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //5
     
             new Vector3(currentPosition.x + _innerLength/2, _height + currentPosition.y, currentPosition.z + _innerWidth/2), //6
@@ -1552,7 +1552,7 @@ public class LSystem : MonoBehaviour
         lastObject.Add(roof);
     }
     
-    public void RCRoof2(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
+    public void RCRoof2(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         GameObject roof = new GameObject("RCBuilding");
 
@@ -1569,11 +1569,11 @@ public class LSystem : MonoBehaviour
         // Define the vertices of the cube
         Vector3[] RCVertices = new Vector3[]
         {
-            new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z), //0
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z), //1 
-            new Vector3(currentPosition.x + _length, _dasar + currentPosition.y, currentPosition.z + _width), //2
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _width), //3 
-            new Vector3(currentPosition.x, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //4
+            new Vector3(currentPosition.x + _innerLength - _xoffset, _dasar + currentPosition.y, currentPosition.z -_yoffset), //0
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z - _yoffset), //1 
+            new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //2
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //3 
+            new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + _innerWidth - _yoffset), //4
             new Vector3(currentPosition.x + _innerLength, _dasar + currentPosition.y, currentPosition.z + _innerWidth), //5
     
             new Vector3(currentPosition.x + _innerLength, _height + currentPosition.y, currentPosition.z + _innerWidth), //6
