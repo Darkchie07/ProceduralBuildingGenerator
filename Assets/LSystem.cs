@@ -15,7 +15,7 @@ public class LSystem : MonoBehaviour
     public int iterations;
     public float length = 1.0f;
 
-    public string axiom = "FTFTUF";
+    public string axiom = "";
     private Vector3 currentPosition;
     public List<Vector3> lastCenter = new List<Vector3>();
     public List<GameObject> lastObject = new List<GameObject>();
@@ -33,7 +33,7 @@ public class LSystem : MonoBehaviour
     public List<float> ParamZPosition;
     public List<float> ParamXOffset;
     public List<float> ParamYOffset;
-    private string[] result;
+    public string[] result;
     
     List<char> validShape = new List<char> { 'A', 'B', 'C', 'D' };
     List<char> validRoof = new List<char> { 'X', 'Y' };
@@ -410,6 +410,7 @@ public class LSystem : MonoBehaviour
     {
         // Create a new cube GameObject
         GameObject cube = new GameObject("Cube");
+        cube.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = cube.AddComponent<MeshFilter>();
@@ -644,6 +645,7 @@ public class LSystem : MonoBehaviour
     {
         // Create a new pyramid GameObject
         GameObject pyramid = new GameObject("Pyramid");
+        pyramid.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = pyramid.AddComponent<MeshFilter>();
@@ -716,6 +718,7 @@ public class LSystem : MonoBehaviour
     {
         // Create a new pyramid GameObject
         GameObject pyramid = new GameObject("Pyramid");
+        pyramid.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = pyramid.AddComponent<MeshFilter>();
@@ -788,6 +791,7 @@ public class LSystem : MonoBehaviour
     {
         // Create a new pyramid GameObject
         GameObject UBuilding = new GameObject("UBuilding");
+        UBuilding.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = UBuilding.AddComponent<MeshFilter>();
@@ -991,6 +995,7 @@ public class LSystem : MonoBehaviour
     public void CreateLBuilding(bool door, bool stair, bool window, float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
         GameObject LBuilding = new GameObject("LBuilding");
+        LBuilding.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = LBuilding.AddComponent<MeshFilter>();
@@ -1086,6 +1091,7 @@ public class LSystem : MonoBehaviour
     public void CreateRCBuilding(bool door, bool stair, bool window, float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f)
     {
         GameObject RCBuilding = new GameObject("RCBuilding");
+        RCBuilding.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = RCBuilding.AddComponent<MeshFilter>();
@@ -1182,6 +1188,7 @@ public class LSystem : MonoBehaviour
     {
         // Create a new cube GameObject
         GameObject roof = new GameObject("Roof");
+        roof.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
@@ -1207,9 +1214,9 @@ public class LSystem : MonoBehaviour
             new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //6
             new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //7 
             new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //8
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength,  + currentPosition.y, currentPosition.z + _width + _yoffset), //9
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength,_dasar  + currentPosition.y, currentPosition.z + _width + _yoffset), //9
             
-            new Vector3(currentPosition.x + (tempInnerLength / 2),  + currentPosition.y, currentPosition.z), //10
+            new Vector3(currentPosition.x + (tempInnerLength / 2),_height  + currentPosition.y, currentPosition.z), //10
             new Vector3(currentPosition.x + (tempInnerLength / 2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //11
             new Vector3((currentPosition.x + _length) - (_innerLength/2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //13
             new Vector3((currentPosition.x + _length) - (_innerLength/2), _height + currentPosition.y, currentPosition.z), //12
@@ -1269,6 +1276,7 @@ public class LSystem : MonoBehaviour
     {
         // Create a new cube GameObject
         GameObject roof = new GameObject("Roof");
+        roof.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
@@ -1294,7 +1302,7 @@ public class LSystem : MonoBehaviour
             new Vector3(currentPosition.x + _length + _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //6
             new Vector3(currentPosition.x - _xoffset, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //7 
             new Vector3(currentPosition.x + tempInnerLength, _dasar + currentPosition.y, currentPosition.z + _width + _yoffset), //8
-            new Vector3(currentPosition.x + tempInnerLength + _innerLength,  + currentPosition.y, currentPosition.z + _width + _yoffset), //9
+            new Vector3(currentPosition.x + tempInnerLength + _innerLength,_dasar  + currentPosition.y, currentPosition.z + _width + _yoffset), //9
             
             new Vector3(currentPosition.x + (tempInnerLength / 2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //10
             new Vector3((currentPosition.x + _length) - (_innerLength/2), _height + currentPosition.y, currentPosition.z + _innerWidth + tempInnerZ), //11
@@ -1349,6 +1357,7 @@ public class LSystem : MonoBehaviour
     public void LRoof1(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         GameObject roof = new GameObject("LRoof");
+        roof.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
@@ -1383,7 +1392,7 @@ public class LSystem : MonoBehaviour
             4, 0 ,5,
             4, 2, 0,
             
-            0, 6, 1,
+            0, 1, 6,
             
             2, 7, 6,
             2, 6, 1,
@@ -1420,6 +1429,7 @@ public class LSystem : MonoBehaviour
     public void LRoof2(float _length = 0f, float _width = 0f, float _height = 0f,  float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         GameObject roof = new GameObject("LRoof");
+        roof.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
@@ -1485,6 +1495,7 @@ public class LSystem : MonoBehaviour
     public void RCRoof1(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         GameObject roof = new GameObject("RCBuilding");
+        roof.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = roof.AddComponent<MeshFilter>();
@@ -1555,6 +1566,7 @@ public class LSystem : MonoBehaviour
     public void RCRoof2(float _length = 0f, float _width = 0f, float _height = 0f, float _innerLength = 0f, float _innerWidth = 0f, float _dasar = 0f, float _xoffset = 0f, float _yoffset = 0f)
     {
         GameObject roof = new GameObject("RCBuilding");
+        roof.transform.parent = transform;
 
         // Add MeshFilter and MeshRenderer components
         MeshFilter meshFilter = roof.AddComponent<MeshFilter>();

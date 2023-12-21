@@ -6,6 +6,8 @@ public class CharacterMovement : MonoBehaviour
 {
     public float moveSpeed = 5f; // Adjust the movement speed.
     private Transform mainCamera;
+    public GameObject _input;
+    public GameObject _save;
 
     private void Start()
     {
@@ -35,5 +37,16 @@ public class CharacterMovement : MonoBehaviour
 
         // Apply movement.
         transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
+        
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            _input.SetActive(true);
+            this.GetComponent<CharacterMovement>().enabled = false;
+        }else if (Input.GetKeyDown(KeyCode.B))
+        {
+            _save.SetActive(true);
+            this.GetComponent<CharacterMovement>().enabled = false;
+        }
+
     }
 }

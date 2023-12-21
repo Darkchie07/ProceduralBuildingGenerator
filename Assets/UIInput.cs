@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class UIInput : MonoBehaviour
 {
@@ -43,11 +45,16 @@ public class UIInput : MonoBehaviour
     public Material colorDoor;
     public Material colorWindow;
     public Material colorStair;
+    
+    public GameObject oldObject;
+    public CharacterMovement _CharacterMovement;
+
+    public TMP_InputField prefabName;
 
     // Start is called before the first frame update
     private void Start()
     {
-        colorShape = Resources.Load<Material>("Material/ShapeMaterial");
+        colorShape = new Material(Resources.Load<Material>("Material/ShapeMaterial"));
         colorRoof = Resources.Load<Material>("Material/RoofMaterial");
         colorDoor = Resources.Load<Material>("Material/DoorMaterial");
         colorWindow = Resources.Load<Material>("Material/WindowMaterial");
@@ -213,6 +220,13 @@ public class UIInput : MonoBehaviour
 
     public void GetParameter()
     {
+        _paramLength.Clear();
+        _paramWidth.Clear();
+        _paramHeight.Clear();
+        _paramInnerLength.Clear();
+        _paramInnerWidth.Clear();
+        _paramXOffset.Clear();
+        _paramYOffset.Clear();
         GameObject[] length = GameObject.FindGameObjectsWithTag("Length");
         GameObject[] width = GameObject.FindGameObjectsWithTag("Width");
         GameObject[] height = GameObject.FindGameObjectsWithTag("Height");
@@ -242,18 +256,30 @@ public class UIInput : MonoBehaviour
             _paramZPosition.Add(ParseFloatOrDefault(Zposition[i].GetComponent<TMP_InputField>().text));
         }
         
-        //Instantiate an empty GameObject
-        GameObject emptyGameObject = new GameObject("EmptyGameObject");
-    
-        // You can also set the position, rotation, and parent if needed
-        emptyGameObject.transform.position = new Vector3(0f, 0f, 0f);
-        emptyGameObject.transform.rotation = Quaternion.identity;
-        LSystem lSystem = emptyGameObject.AddComponent<LSystem>();
+        if (oldObject != null)
+        {
+            // Instantiate the new object
+            GameObject emptyGameObject = new GameObject("House");
+            
+            // Destroy the old object
+            Destroy(oldObject);
+
+            // Assign the new object reference
+            oldObject = emptyGameObject;
+        }
+        else
+        {
+            GameObject emptyGameObject = new GameObject("House");
+            oldObject = emptyGameObject;
+        }
+        oldObject.transform.position = new Vector3(0f, 0f, 0f);
+        oldObject.transform.rotation = Quaternion.identity;
+        LSystem lSystem = oldObject.AddComponent<LSystem>();
         lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth, 
             _paramXPosition, _paramYPosition, _paramZPosition, _paramXOffset,  _paramYOffset, result,
             colorShape.color, colorRoof.color, colorDoor.color, colorWindow.color, fcpStair.color);
+        _CharacterMovement.enabled = true;
 
-        Debug.Log(fcpShape.color);
         // if (CheckValidParameter())
         // {
         //     // Instantiate an empty GameObject
@@ -296,6 +322,8 @@ public class UIInput : MonoBehaviour
 
     public void SetMaterial()
     {
+        Material tryShape = new Material(colorShape);
+        tryShape.color = fcpShape.color;
         colorShape.color = fcpShape.color;
         colorRoof.color = fcpRoof.color;
         colorDoor.color = fcpDoor.color;
@@ -303,4 +331,9 @@ public class UIInput : MonoBehaviour
         colorStair.color = fcpStair.color;
     }
 
+    public void savePrefab()
+    {
+        string prefabPath = "Assets/Prefabs/" + prefabName.text + ".prefab";
+        PrefabUtility.SaveAsPrefabAsset(oldObject, prefabPath);
+    }
 }
