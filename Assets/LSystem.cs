@@ -109,6 +109,7 @@ public class LSystem : MonoBehaviour
             if (result[i][0] == 'C')
             {
                 lastObject.Clear();
+                lastCenter.Clear();
                 if (result[i].Length > 2)
                 {
                     if (result[i][2] == 'W')
@@ -507,8 +508,8 @@ public class LSystem : MonoBehaviour
         mesh.vertices = cubeVertices;
         mesh.triangles = cubeTriangles;
         mesh.RecalculateNormals();
-        
-        lastCenter.Add(center);
+
+        lastCenter.Add(cubeVertices[0]);
         lastObject.Add(cube);
     }
     
@@ -723,7 +724,7 @@ public class LSystem : MonoBehaviour
 
         center /= pyramidVertices.Length;
         
-        lastCenter.Add(center);
+        lastCenter.Add(pyramidVertices[0]);
         lastObject.Add(pyramid);
     }
     
@@ -796,7 +797,7 @@ public class LSystem : MonoBehaviour
 
         center /= pyramidVertices.Length;
         
-        lastCenter.Add(center);
+        lastCenter.Add(pyramidVertices[0]);
         lastObject.Add(pyramid);
     }
 
