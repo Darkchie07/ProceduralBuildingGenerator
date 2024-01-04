@@ -34,17 +34,24 @@ public class UIInput : MonoBehaviour
     public GameObject errorPanel;
     public GameObject inputPanel;
 
-    public FlexibleColorPicker fcpShape;
-    public FlexibleColorPicker fcpRoof;
-    public FlexibleColorPicker fcpDoor;
-    public FlexibleColorPicker fcpWindow;
-    public FlexibleColorPicker fcpStair;
+    // public FlexibleColorPicker fcpShape;
+    // public FlexibleColorPicker fcpRoof;
+    // public FlexibleColorPicker fcpDoor;
+    // public FlexibleColorPicker fcpWindow;
+    // public FlexibleColorPicker fcpStair;
+    
+    public FlexibleColorPicker[] colorObjects;
     
     public Material colorShape;
     public Material colorRoof;
     public Material colorDoor;
     public Material colorWindow;
     public Material colorStair;
+    
+    public List<float> RColor;
+    public List<float> GColor;
+    public List<float> BColor;
+    public List<float> AColor;
     
     public GameObject oldObject;
     public CharacterMovement _CharacterMovement;
@@ -54,11 +61,11 @@ public class UIInput : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        colorShape = new Material(Resources.Load<Material>("Material/ShapeMaterial"));
-        colorRoof = Resources.Load<Material>("Material/RoofMaterial");
-        colorDoor = Resources.Load<Material>("Material/DoorMaterial");
-        colorWindow = Resources.Load<Material>("Material/WindowMaterial");
-        colorStair = Resources.Load<Material>("Material/StairMaterial");
+        // colorShape = new Material(Resources.Load<Material>("Material/ShapeMaterial"));
+        // colorRoof = Resources.Load<Material>("Material/RoofMaterial");
+        // colorDoor = Resources.Load<Material>("Material/DoorMaterial");
+        // colorWindow = Resources.Load<Material>("Material/WindowMaterial");
+        // colorStair = Resources.Load<Material>("Material/StairMaterial");
     }
 
     public void Next()
@@ -201,6 +208,10 @@ public class UIInput : MonoBehaviour
     }
     public void SetInputField()
     {
+        foreach (Transform child in parents.transform)
+        {
+            Destroy(child.gameObject);
+        }
         for (int i = 0; i < result.Length; i++)
         {
             if (result[i][0] == 'C')
@@ -277,7 +288,7 @@ public class UIInput : MonoBehaviour
         LSystem lSystem = oldObject.AddComponent<LSystem>();
         lSystem.SetParameter(initialShape, floorNum, roofType, _paramLength, _paramWidth, _paramHeight, _paramInnerLength, _paramInnerWidth, 
             _paramXPosition, _paramYPosition, _paramZPosition, _paramXOffset,  _paramYOffset, result,
-            colorShape.color, colorRoof.color, colorDoor.color, colorWindow.color, fcpStair.color);
+            RColor, GColor, BColor, AColor);
         _CharacterMovement.enabled = true;
 
         // if (CheckValidParameter())
@@ -322,13 +333,35 @@ public class UIInput : MonoBehaviour
 
     public void SetMaterial()
     {
-        Material tryShape = new Material(colorShape);
-        tryShape.color = fcpShape.color;
-        colorShape.color = fcpShape.color;
-        colorRoof.color = fcpRoof.color;
-        colorDoor.color = fcpDoor.color;
-        colorWindow.color = fcpWindow.color;
-        colorStair.color = fcpStair.color;
+        foreach (FlexibleColorPicker colorObject in colorObjects)
+        {
+            RColor.Add(colorObject.color.r);
+            GColor.Add(colorObject.color.g);
+            BColor.Add(colorObject.color.b);
+            AColor.Add(colorObject.color.a);
+        }
+        
+        // RColor.Add(fcpShape.color.r);
+        // GColor.Add(fcpShape.color.g);
+        // BColor.Add(fcpShape.color.b);
+        // RColor.Add(fcpRoof.color.r);
+        // GColor.Add(fcpRoof.color.g);
+        // BColor.Add(fcpRoof.color.b);
+        // RColor.Add(fcpDoor.color.r);
+        // GColor.Add(fcpDoor.color.g);
+        // BColor.Add(fcpDoor.color.b);
+        // RColor.Add(fcpWindow.color.r);
+        // GColor.Add(fcpWindow.color.g);
+        // BColor.Add(fcpWindow.color.b);
+        // RColor.Add(fcpStair.color.r);
+        // GColor.Add(fcpStair.color.g);
+        // BColor.Add(fcpStair.color.b);
+        
+        // colorShape.color = fcpShape.color;
+        // colorRoof.color = fcpRoof.color;
+        // colorDoor.color = fcpDoor.color;
+        // colorWindow.color = fcpWindow.color;
+        // colorStair.color = fcpStair.color;
     }
 
     public void savePrefab()

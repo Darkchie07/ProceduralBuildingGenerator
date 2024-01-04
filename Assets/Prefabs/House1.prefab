@@ -133,8 +133,8 @@ MonoBehaviour:
   length: 1
   axiom: 
   lastCenter:
-  - {x: 2.5, y: 2, z: 2}
-  - {x: 2.5, y: 4.8, z: 2}
+  - {x: 2.5, y: 2.5, z: 2.5}
+  - {x: 2.5, y: 6, z: 2.5}
   lastObject:
   - {fileID: 9105141515564153553}
   - {fileID: 5424190391822958885}
@@ -144,9 +144,9 @@ MonoBehaviour:
   ParamLength:
   - 5
   ParamWidth:
-  - 4
+  - 5
   ParamHeight:
-  - 4
+  - 5
   ParamInnerLength:
   - 0
   ParamInnerWidth:
@@ -157,6 +157,30 @@ MonoBehaviour:
   ParamXOffset:
   - 1
   ParamYOffset:
+  - 1
+  RColor:
+  - 0.4569583
+  - 0
+  - 1
+  - 1
+  - 1
+  GColor:
+  - 0
+  - 1
+  - 0
+  - 0
+  - 0
+  BColor:
+  - 1
+  - 0.9691484
+  - 0
+  - 0
+  - 0
+  AColor:
+  - 1
+  - 1
+  - 1
+  - 1
   - 1
   result:
   - CX

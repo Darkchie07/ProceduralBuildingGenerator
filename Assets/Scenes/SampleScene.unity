@@ -7285,6 +7285,10 @@ MonoBehaviour:
   ParamZPosition: []
   ParamXOffset: []
   ParamYOffset: []
+  RColor: []
+  GColor: []
+  BColor: []
+  AColor: []
   result: []
   prefabs: {fileID: 5971486143198458541, guid: 2d1684dac503c4942acfd43bf6bf3dd1, type: 3}
   colorShape: {fileID: 0}
@@ -7673,16 +7677,21 @@ MonoBehaviour:
   _paramYOffset: []
   errorPanel: {fileID: 1814804993}
   inputPanel: {fileID: 1506697405}
-  fcpShape: {fileID: 598192617}
-  fcpRoof: {fileID: 2145588822}
-  fcpDoor: {fileID: 665701251}
-  fcpWindow: {fileID: 762117364}
-  fcpStair: {fileID: 1940731236}
+  colorObjects:
+  - {fileID: 598192617}
+  - {fileID: 2145588822}
+  - {fileID: 665701251}
+  - {fileID: 762117364}
+  - {fileID: 1940731236}
   colorShape: {fileID: 0}
   colorRoof: {fileID: 0}
   colorDoor: {fileID: 0}
   colorWindow: {fileID: 0}
   colorStair: {fileID: 0}
+  RColor: []
+  GColor: []
+  BColor: []
+  AColor: []
   oldObject: {fileID: 0}
   _CharacterMovement: {fileID: 1964089681}
   prefabName: {fileID: 987070720}

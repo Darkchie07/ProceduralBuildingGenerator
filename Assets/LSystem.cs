@@ -33,6 +33,10 @@ public class LSystem : MonoBehaviour
     public List<float> ParamZPosition;
     public List<float> ParamXOffset;
     public List<float> ParamYOffset;
+    public List<float> RColor;
+    public List<float> GColor;
+    public List<float> BColor;
+    public List<float> AColor;
     public string[] result;
     
     List<char> validShape = new List<char> { 'A', 'B', 'C', 'D' };
@@ -57,7 +61,7 @@ public class LSystem : MonoBehaviour
         GenerateLSystem();
     }
     public void SetParameter(List<char> _initialShape, List<int> _floorNum, List<char> _roofType, List<float> _paramLength, List<float> _paramWidth, List<float> _paramHeight, List<float> _paramInnerLength, List<float> _paramInnerWidth
-    , List<float> _paramXPosition, List<float> _paramYPosition, List<float> _paramZPosition, List<float> _paramXoffset, List<float> _paramYoffset, string[] _result, UnityEngine.Color _shape, UnityEngine.Color _roof, UnityEngine.Color _door, UnityEngine.Color _window, UnityEngine.Color _stair)
+    , List<float> _paramXPosition, List<float> _paramYPosition, List<float> _paramZPosition, List<float> _paramXoffset, List<float> _paramYoffset, string[] _result, List<float> _rcolor, List<float> _gcolor, List<float> _bcolor, List<float> _acolor)
     {
         initialShape = _initialShape;
         floorNum = _floorNum;
@@ -73,6 +77,10 @@ public class LSystem : MonoBehaviour
         ParamXOffset = _paramXoffset;
         ParamYOffset = _paramYoffset;
         result = _result;
+        RColor = _rcolor;
+        GColor = _gcolor;
+        BColor = _bcolor;
+        AColor = _acolor;
         /*colorShape.color = _shape;
         colorRoof.color = _roof;
         colorDoor.color = _door;
@@ -82,6 +90,11 @@ public class LSystem : MonoBehaviour
 
     void GenerateLSystem()
     {
+        colorShape.color = new UnityEngine.Color(RColor[0], GColor[0], BColor[0], AColor[0]);
+        colorRoof.color = new UnityEngine.Color(RColor[1], GColor[1], BColor[1], AColor[1]);
+        colorDoor.color = new UnityEngine.Color(RColor[2], GColor[2], BColor[2], AColor[2]);
+        colorWindow.color = new UnityEngine.Color(RColor[3], GColor[3], BColor[3], AColor[3]);
+        colorStair.color = new UnityEngine.Color(RColor[4], GColor[4], BColor[4], AColor[4]);
         int indexPos = 0;
         int indexSize = 0;
         for (int i = 0; i < result.Length; i++)
