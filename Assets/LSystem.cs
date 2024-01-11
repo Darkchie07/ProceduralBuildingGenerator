@@ -949,10 +949,10 @@ public class LSystem : MonoBehaviour
                 Vector3[] windowVertices = new Vector3[]
                 {
                     // Front face
-                    new Vector3(q1.x, _height * 0.25f, q1.z),
-                    new Vector3(q1.x, _height * 0.75f, q1.z),
-                    new Vector3(q3.x, _height * 0.75f, q3.z),
-                    new Vector3(q3.x, _height * 0.25f, q3.z),
+                    new Vector3(q1.x, _height * 0.25f + currentPosition.y, q1.z),
+                    new Vector3(q1.x, _height * 0.75f + currentPosition.y, q1.z),
+                    new Vector3(q3.x, _height * 0.75f + currentPosition.y, q3.z),
+                    new Vector3(q3.x, _height * 0.25f + currentPosition.y, q3.z),
                 };
                 // Define the triangles for the window
                 int[] windowTriangles = new int[]
